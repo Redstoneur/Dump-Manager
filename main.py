@@ -14,6 +14,9 @@ def main(run: str = "nothing") -> Error:
     start: WeekDay = getActualWeekDay()
 
     if information():  # if read information
+        if run == "debugN1":  # if run in debug mode
+            print("\nDebug mode N1")
+            error = Error(success=True, message="Debug mode N1", code=2109)
         if run == "shell":  # if run shell
             error = ShellRunner()
         elif run == "db":  # if run database

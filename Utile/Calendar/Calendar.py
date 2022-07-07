@@ -31,14 +31,12 @@ class Calendar(ABC):
         else:
             self.Date = date
 
-
     def setActualCalendar(self) -> None:
         """
         Set the actual calendar
         :return: None
         """
         self.Date.setActualWeekDay()
-
 
     def __str__(self) -> str:
         """
@@ -48,7 +46,6 @@ class Calendar(ABC):
         return "Date: " + self.Date.__str__() + "\n" + \
                "Title: " + self.Title + "\n" + \
                "Description: " + self.Description + "\n"
-
 
     def __eq__(self, other) -> bool:
         """

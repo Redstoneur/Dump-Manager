@@ -57,6 +57,7 @@ class WeekDay:
         else:
             return False
 
+
 ######################################################################################################################
 ############################## Special Functions #####################################################################
 ######################################################################################################################
@@ -66,6 +67,4 @@ def getActualWeekDay() -> WeekDay:
     Get the actual week day
     :return: WeekDay
     """
-    dateTime = DateTime()
-    dateTime.setActualDateTime()
-    return WeekDay(dateTime)
+    return WeekDay(getActualDateTime())

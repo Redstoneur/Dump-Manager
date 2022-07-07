@@ -56,8 +56,4 @@ def getActualDateTime() -> DateTime:
     Get the actual date and time
     :return: DateTime
     """
-    date = Date()
-    time = Time()
-    date.setActualDate()
-    time.setActualTime()
-    return DateTime(date, time)
+    return DateTime(getActualDate(), getactualTime())

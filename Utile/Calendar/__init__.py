@@ -28,12 +28,12 @@ class ErrorCalendar(Calendar):
         super().__init__(title=title, description=description, date=date)
         self.content = content
         if start is None:
-            self.start = WeekDay()
+            self.start = getActualWeekDay()
         else:
             self.start = start
 
         if end is None:
-            self.end = WeekDay()
+            self.end = getActualWeekDay()
         else:
             self.end = end
 

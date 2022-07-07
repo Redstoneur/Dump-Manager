@@ -1,4 +1,4 @@
-import datetime as dt
+import time as t
 
 
 ######################################################################################################################
@@ -26,10 +26,13 @@ class Date:
         Set the actual date
         :return: None
         """
-        now = dt.datetime.now()
-        self.Day = now.day
-        self.Month = now.month
-        self.Year = now.year
+        now: t.struct_time = t.localtime()
+        # day
+        self.Day = now.tm_mday
+        # month
+        self.Month = now.tm_mon
+        # year
+        self.Year = now.tm_year
 
     def __str__(self) -> str:
         """

@@ -18,7 +18,7 @@ def LogFileManager(error: Error) -> Error:
         f: file = generateFile(path=path, sp='engineer', debug=True)  # create or verify the file
 
         if f is None:  # if the file is a TxtFile
-            print("\nGenerating " + path)
+            print("Generating " + path)
             b: bool = createTxtFile(path)  # create a TxtFile object with the file
             f: file = generateFile(path=path, sp='engineer', debug=True)  # create or verify the file
 
