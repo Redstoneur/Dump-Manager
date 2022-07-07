@@ -1,7 +1,7 @@
 import mysql.connector as mysql
 
-class databaseExecutor:
 
+class databaseExecutor:
     name: str
     user: str
     password: str
@@ -49,7 +49,6 @@ class databaseExecutor:
         except Exception as e:
             print(e)
             exit()
-
 
     def execute(self, query, values=None):
         try:

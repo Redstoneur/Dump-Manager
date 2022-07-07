@@ -1,6 +1,8 @@
 import sys
+from Utile import *
+
 from Database import mainVersionDB
-from Utile import Error
+from DevFileManager import *
 from Runner import *
 
 
@@ -23,42 +25,10 @@ def main(run: str = "nothing") -> Error:
         error = Error(success=False, message="Error: information", code=4)
 
     # create a file with a Calendar of the last dump
-    print("\nCreating Calendar of the last dump")
-    try:  # try to create a file with a Calendar of the last dump
-        f: file = generateFile(path="./Data/calendar.txt", sp='engineer', debug=True)
-        if isinstance(f, TxtFile):  # if the file is a TxtFile
-            txt: TxtFile = TxtFile(path=f.getPath())
-            calendar: Calendar = Calendar(title="Dumps",
-                                          description="Dumps of the databases",
-                                          content=result.line())
-            txt.__add__(data="\n#####################################################"
-                             "#######################################\n\n " + calendar.__str__())
-            print("Calendar created")
-        else:  # if not a TxtFile
-            print("Error: calendar")
-    except Exception as e:  # if not create a file with a Calendar of the last dump
-        print(e)
-        print("Error: calendar")
-    else:  # if create a file with a Calendar of the last dump
-        print("Calendar script finished")
+    CalendarFileManager(error)
 
     # create a file log with the error
-    print("\nCreating log file")
-    try:  # try to create a file log with the error
-        f: file = generateFile(path="./Data/log.txt", sp='engineer', debug=True)
-        if isinstance(f, TxtFile):  # if the file is a TxtFile
-            txt: TxtFile = TxtFile(path=f.getPath())
-            txt.write(data=result.__str__())
-            print("Log file created")
-        else:  # if not a TxtFile
-            print("Error: log")
-    except Exception as e:  # if not create a file log with the error
-        print(e)
-        print("Error: can't create log file")
-    else:  # if create a file log with the error
-        print("Log file script finished")
-
-    print("\n")
+    LogFileManager(error)
 
     return error
 

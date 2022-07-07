@@ -1,5 +1,4 @@
 import sys
-from FileAndFolder import *
 from Utile import *
 
 DatabaseInfo: JsonFile = JsonFile("./Data/Database-Information.json")
@@ -8,7 +7,6 @@ DatabaseInfo: JsonFile = JsonFile("./Data/Database-Information.json")
 DumpsPath: str = DatabaseInfo.get("path-dumps")
 if DumpsPath is None or DumpsPath == "":
     DumpsPath = "./Data/Dumps"
-    print(DumpsPath)
 FoldersContained: FoldersContained = FoldersContained(DumpsPath)
 
 # noinspection PyTypeChecker

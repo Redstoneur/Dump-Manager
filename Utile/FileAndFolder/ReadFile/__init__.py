@@ -1,9 +1,9 @@
 import os
-from FileAndFolder.ReadFile.File import *
-from FileAndFolder.ReadFile.SqlFile import *
-from FileAndFolder.ReadFile.DumpSqlFile import *
-from FileAndFolder.ReadFile.TxtFile import *
-from FileAndFolder.ReadFile.JsonFile import *
+from Utile.FileAndFolder.ReadFile.File import *
+from Utile.FileAndFolder.ReadFile.SqlFile import *
+from Utile.FileAndFolder.ReadFile.DumpSqlFile import *
+from Utile.FileAndFolder.ReadFile.TxtFile import *
+from Utile.FileAndFolder.ReadFile.JsonFile import *
 
 
 def existFile(path: str) -> bool:
@@ -39,4 +39,7 @@ def generateFile(path: str, sp: str = None, debug: bool = False) -> None | file:
             exit()
     else:
         print("File not found")
+        print(path)
+        print(sp)
+        print(debug)
         exit()

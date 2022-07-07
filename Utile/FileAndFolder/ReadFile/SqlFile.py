@@ -1,4 +1,4 @@
-from FileAndFolder.ReadFile.File import *
+from Utile.FileAndFolder.ReadFile.File import *
 
 
 class SqlFile(file):

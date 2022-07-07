@@ -36,7 +36,10 @@ class Date:
         String representation of the class Date
         :return: str
         """
-        return str(self.Day) + "/" + str(self.Month) + "/" + str(self.Year)
+        day: str = "0" + str(self.Day) if self.Day < 10 else str(self.Day)
+        month: str = "0" + str(self.Month) if self.Month < 10 else str(self.Month)
+        year: str = str(self.Year)
+        return day + "/" + month + "/" + year
 
     def __eq__(self, other) -> bool:
         """

@@ -1,12 +1,12 @@
 from Database.DatabaseExecutor import *
-from FileAndFolder import *
-from Utile import Error
+from Utile import *
 
-GeneriquePath = "C:/Users/alipio.simoes/Desktop/Workbench/Docker/AddDumpBdPython"
+DatabaseInfo: JsonFile = JsonFile("./Data/Database-Information.json")
 
-DatabaseInfo: JsonFile = generateFile(path=GeneriquePath + "/Data/Database/DockerDatabaseInfo.json", debug=True)
-
-DumpsPath = GeneriquePath + "/Dumps"
+# noinspection PyTypeChecker
+DumpsPath: str = DatabaseInfo.get("path-dumps")
+if DumpsPath is None or DumpsPath == "":
+    DumpsPath = "./Data/Dumps"
 FoldersContained: FoldersContained = FoldersContained(DumpsPath)
 
 

@@ -49,8 +49,12 @@ class Time:
         String representation of the class Time
         :return: str
         """
-        return str(self.Hours) + ":" + str(self.Minutes) + ":" + str(self.Seconds) + ":" + str(
-            self.Milliseconds) + ":" + str(self.Microseconds) + ":" + str(self.Nanoseconds)
+        hours: str = "0" + str(self.Hours) if self.Hours < 10 else str(self.Hours)
+        minutes: str = "0" + str(self.Minutes) if self.Minutes < 10 else str(self.Minutes)
+        seconds: str = "0" + str(self.Seconds) if self.Seconds < 10 else str(self.Seconds)
+        milliseconds: str = "0" + str(self.Milliseconds) if self.Milliseconds < 10 else str(self.Milliseconds)
+        microseconds: str = "0" + str(self.Microseconds) if self.Microseconds < 10 else str(self.Microseconds)
+        return hours + ":" + minutes + ":" + seconds + "." + milliseconds + "." + microseconds
 
     def __eq__(self, other) -> bool:
         """

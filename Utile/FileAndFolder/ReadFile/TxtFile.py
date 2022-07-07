@@ -1,9 +1,8 @@
-from FileAndFolder.ReadFile.File import *
-import json
+from Utile.FileAndFolder.ReadFile.File import *
 
 
-class JsonFile(file):
-    data: dict
+class TxtFile(file):
+    data: str
     path: str
 
     def __init__(self, path: str) -> None:
@@ -21,13 +20,13 @@ class JsonFile(file):
         """
         try:
             with open(self.path, 'r') as f:
-                self.data = json.load(f)
+                self.data = f.read()
                 f.close()
         except Exception as e:
             print(e)
             exit()
 
-    def write(self, data: dict) -> None:
+    def write(self, data: str) -> None:
         """
         write data to file
         :param data:
@@ -35,36 +34,24 @@ class JsonFile(file):
         """
         try:
             with open(self.path, 'w') as f:
-                json.dump(data, f)
+                f.write(data)
                 f.close()
         except Exception as e:
             print(e)
             exit()
 
-    def getData(self) -> dict:
+    def getData(self) -> str:
         """
         get data
         :return:
         """
         return self.data
 
-    def get(self, key: str) -> object:
+    def __add__(self, data: str) -> None:
         """
-        get data of key
-        :param key:
+        add two file
+        :param other:
         :return:
         """
-        if key in self.data.keys():
-            return self.data[key]
-        else:
-            return None
-
-    def set(self, key: str, value: str) -> None:
-        """
-        set data of key
-        :param key:
-        :param value:
-        :return:
-        """
-        self.data[key] = value
+        self.data += data
         self.write(self.data)
