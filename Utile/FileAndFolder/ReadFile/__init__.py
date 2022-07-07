@@ -6,6 +6,10 @@ from Utile.FileAndFolder.ReadFile.TxtFile import *
 from Utile.FileAndFolder.ReadFile.JsonFile import *
 
 
+######################################################################################################################
+############################## Special Functions #####################################################################
+######################################################################################################################
+
 def existFile(path: str) -> bool:
     """
     check if file exist
@@ -14,11 +18,13 @@ def existFile(path: str) -> bool:
     """
     return os.path.isfile(path)
 
+
 def generateFile(path: str, sp: str = None, debug: bool = False) -> None | file:
     """
     generate a read file
     :param path: path to file
-    :param debug: debug mode
+    :param sp: specific name's type of file
+    :param debug: bool, True if debug, False if not
     :return:
     """
     if existFile(path):
@@ -32,14 +38,11 @@ def generateFile(path: str, sp: str = None, debug: bool = False) -> None | file:
         elif path.split('.')[-1] == "json":
             return JsonFile(path=path)
         elif debug:
-            print("file not found: " + path)
+            print("file type not found : " + path)
             return None
         else:
             print("File type not found")
-            exit()
+            return None
     else:
-        print("File not found")
-        print(path)
-        print(sp)
-        print(debug)
-        exit()
+        print("File not found : " + path)
+        return None

@@ -1,29 +1,43 @@
 from Utile import *
 
 
-def CalendarFileManager(error: Error) -> Error:
+def CalendarFileManager(start: WeekDay, error: Error) -> Error:
     """
     Create and modify a file with a Calendar of the last dump
     :param error: Error, error object
     :return: None
     """
     result: Error
+    b: bool = True
+    path: str = "./Data/calendar.txt"
 
     print("\nCreating Calendar of the last dump")
 
     try:  # try to create a file with a Calendar of the last dump
 
-        f: file = generateFile(path="./Data/calendar.txt", sp='engineer', debug=True)  # create or verify the file
+        f: file = generateFile(path=path, sp='engineer', debug=True)  # create or verify the file
 
-        if isinstance(f, TxtFile):  # if the file is a TxtFile
+        if f is None:  # if the file is a TxtFile
+            print("Generating " + path)
+            b: bool = createTxtFile(path)  # create a TxtFile object with the file
+            f: file = generateFile(path=path, sp='engineer', debug=True)  # create or verify the file
+
+        if isinstance(f, TxtFile) and b:  # if the file is a TxtFile
             txt: TxtFile = TxtFile(path=f.getPath())  # create a TxtFile object with the file
-            calendar: Calendar = Calendar(title="Dumps",
-                                          description="Dumps of the databases",
-                                          content=error.line())  # create a Calendar object with the error
+            calendar: ErrorCalendar = ErrorCalendar(title="Dumps",
+                                                    description="Dumps of the databases",
+                                                    date=start.dateTime.Date,
+                                                    start=start,
+                                                    content=error.line())  # create a Calendar object with the error
 
-            # add the Calendar to the file
-            txt.__add__(data="\n#####################################################"
-                             "#######################################\n\n " + calendar.__str__())
+            if txt.data == "":  # if not have data in the file
+                # put the Calendar in the file
+                txt.write(data=calendar.__str__())
+
+            else:  # if have data in the file
+                # add the Calendar to the file
+                txt.__add__(data="\n#####################################################"
+                                 "#######################################\n\n " + calendar.__str__())
 
             print("Calendar created")
             result = Error(success=True, message="Calendar created", code=0)

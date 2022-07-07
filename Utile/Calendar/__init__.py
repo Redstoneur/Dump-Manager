@@ -2,72 +2,65 @@ from Utile.Calendar.Date import *
 from Utile.Calendar.Time import *
 from Utile.Calendar.DateTime import *
 from Utile.Calendar.WeekDay import *
+from Utile.Calendar.Calendar import *
 
 
 ######################################################################################################################
-############################## Class Calendar ########################################################################
+############################## Class Error Calendar ##################################################################
 ######################################################################################################################
 
-class Calendar:
-    WeekDay: WeekDay = None
-    Title: str = ""
-    Description: str = ""
-    Content: str = ""
-    src: str = ""
-    dst: str = ""
+class ErrorCalendar(Calendar):
+    start: WeekDay = None
+    end: WeekDay = None
+    content: str = ""
 
-    def __init__(self, title: str, description: str = Description,
-                 content: str = Content, src: str = src, dst: str = dst, weekDay: WeekDay = None) -> None:
+    def __init__(self, title: str, description: str = "",
+                 content: str = "", date: Date = None, start: WeekDay = None, end: WeekDay = None) -> None:
         """
-        Constructor of the class Calendar
-        :param weekDay: WeekDay
+        Constructor of the class ErrorCalendar
         :param title: str
         :param description: str
         :param content: str
-        :param src: str
-        :param dst: str
+        :param date: Date
+        :param start: WeekDay
+        :param end: WeekDay
         """
-        self.Title = title
-        self.Description = description
-        self.Content = content
-        self.src = src
-        self.dst = dst
-
-        if weekDay is None:
-            self.WeekDay = getActualWeekDay()
+        super().__init__(title=title, description=description, date=date)
+        self.content = content
+        if start is None:
+            self.start = WeekDay()
         else:
-            self.WeekDay = weekDay
+            self.start = start
 
-    def setActualCalendar(self) -> None:
-        """
-        Set the actual calendar
-        :return: None
-        """
-        self.WeekDay.setActualWeekDay()
+        if end is None:
+            self.end = WeekDay()
+        else:
+            self.end = end
 
     def __str__(self) -> str:
         """
-        String representation of the class Calendar
+        String representation of the class ErrorCalendar
         :return: str
         """
-        return "WeekDay: " + self.WeekDay.__str__() + "\n" + \
+        return "Date: " + self.Date.__str__() + "\n" + \
                "Title: " + self.Title + "\n" + \
                "Description: " + self.Description + "\n" + \
-               "Content: " + self.Content + "\n"
+               "Content: " + self.content + "\n" \
+               "Start: " + self.start.__str__() + "\n" \
+               "End: " + self.end.__str__() + "\n"
 
     def __eq__(self, other) -> bool:
         """
-        Compare two calendars
-        :param other: Calendar
+        Compare two ErrorCalendar objects
+        :param other: ErrorCalendar
         :return: bool
         """
-        # if other is a Calendar
-        if isinstance(other, Calendar):
-            return self.WeekDay == other.WeekDay \
+        if isinstance(other, ErrorCalendar):
+            return self.Date == other.Date \
                    and self.Title == other.Title \
                    and self.Description == other.Description \
-                   and self.Content == other.Content \
-                   and self.src == other.src \
-                   and self.dst == other.dst
+                   and self.content == other.content \
+                   and self.start == other.start \
+                   and self.end == other.end
         else:
             return False

@@ -1,6 +1,5 @@
 import sys
-from Utile import *
-
+from Utile import Error
 from DevFileManager import *
 from Runner import *
 
@@ -12,10 +11,11 @@ def main(run: str = "nothing") -> Error:
     :return: Error, error object
     """
     error: Error
+    start: WeekDay = getActualWeekDay()
 
     if information():  # if read information
         if run == "shell":  # if run shell
-            error: Error = ShellRunner()
+            error = ShellRunner()
         elif run == "db":  # if run database
             error = DbRunner()
         else:  # if run nothing
@@ -24,10 +24,9 @@ def main(run: str = "nothing") -> Error:
         error = Error(success=False, message="Error: information", code=4)
 
     # create a file with a Calendar of the last dump
-    CalendarFileManager(error)
-
+    CalendarFileManager(start=start, error=error)
     # create a file log with the error
-    LogFileManager(error)
+    LogFileManager(error=error)
 
     return error
 

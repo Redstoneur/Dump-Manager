@@ -8,14 +8,21 @@ def LogFileManager(error: Error) -> Error:
     :return: None
     """
     result: Error
+    b: bool = True
+    path: str = "./Data/log.txt"
 
     print("\nCreating log file")
 
     try:  # try to create a file log with the error
 
-        f: file = generateFile(path="./Data/log.txt", sp='engineer', debug=True)  # create or verify the file
+        f: file = generateFile(path=path, sp='engineer', debug=True)  # create or verify the file
 
-        if isinstance(f, TxtFile):  # if the file is a TxtFile
+        if f is None:  # if the file is a TxtFile
+            print("\nGenerating " + path)
+            b: bool = createTxtFile(path)  # create a TxtFile object with the file
+            f: file = generateFile(path=path, sp='engineer', debug=True)  # create or verify the file
+
+        if isinstance(f, TxtFile) and b:  # if the file is a TxtFile
             txt: TxtFile = TxtFile(path=f.getPath())  # create a TxtFile object with the file
             txt.write(data=error.__str__())  # write the error in the file
 

@@ -1,6 +1,10 @@
 from Utile.FileAndFolder.ReadFile.File import *
 
 
+######################################################################################################################
+############################## Class TXT File ########################################################################
+######################################################################################################################
+
 class TxtFile(file):
     data: str
     path: str
@@ -47,6 +51,13 @@ class TxtFile(file):
         """
         return self.data
 
+    def getPath(self) -> str:
+        """
+        get path
+        :return:
+        """
+        return self.path
+
     def __add__(self, data: str) -> None:
         """
         add two file
@@ -55,3 +66,31 @@ class TxtFile(file):
         """
         self.data += data
         self.write(self.data)
+
+
+######################################################################################################################
+############################## Special Functions #####################################################################
+######################################################################################################################
+
+def createTxtFile(path: str) -> bool:
+    """
+    create a txt file
+    :param path: path to file
+    :param content: content of the file
+    :return: None
+    """
+    if path.split('.')[-1] == "txt":
+        try:
+            f = open(path, "w")
+            f.write("")
+            f.close()
+        except Exception as e:
+            print(e)
+            print("Error: can't create file")
+            return False
+        else:
+            print("File created")
+            return True
+    else:
+        print("Not a txt file")
+        return False

@@ -2,6 +2,10 @@ from Utile.Calendar import *
 from Utile.FileAndFolder import *
 
 
+######################################################################################################################
+############################## Class Error ###########################################################################
+######################################################################################################################
+
 class Error:
     success: bool = True
     message: str = "success"
@@ -19,4 +23,4 @@ class Error:
 
     def line(self) -> str:
         return "success: " + str(self.success) + " | message: " + self.message + \
-                       " | code: " + str(self.code)
+               " | code: " + str(self.code)
