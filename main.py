@@ -1,7 +1,6 @@
 import sys
 from Utile import *
 
-from Database import mainVersionDB
 from DevFileManager import *
 from Runner import *
 
@@ -18,7 +17,7 @@ def main(run: str = "nothing") -> Error:
         if run == "shell":  # if run shell
             error: Error = ShellRunner()
         elif run == "db":  # if run database
-            error = mainVersionDB()
+            error = DbRunner()
         else:  # if run nothing
             error = Error(success=False, message="run not found", code=3)
     else:  # if not read information
