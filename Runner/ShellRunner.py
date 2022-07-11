@@ -1,6 +1,10 @@
 import sys
 from Utile import *
 
+######################################################################################################################
+############################## Shell Runner ##########################################################################
+######################################################################################################################
+
 DatabaseInfo: JsonFile = JsonFile("./Data/Database-Information.json")
 
 # noinspection PyTypeChecker
@@ -27,12 +31,17 @@ def ShellRunner() -> Error:
     print("Dump started")
 
     error: Error
+    numbersOfDumps: int = 0
+    numbersOfDumpsSuccess: int = 0
+    numbersOfDumpsError: int = 0
+    numbersOfFiles: int = 0
     success: bool = True
     message: str = "success"
     code: int = 200
 
     # get all dumps in the folder and add them to the server with a shell command to load the dump in the database
     for folder in FoldersContained.folders:
+        numbersOfFiles += 1
 
         # don't read Dumps.md
         if folder == "Dumps.md":
@@ -41,7 +50,7 @@ def ShellRunner() -> Error:
         # create variables file to use in shell command of dump
         f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
 
-        if f is not None and f.getExtension() == "sql":
+        if f is not None and f.getExtension() == "sql":  # if the file is a sql file
 
             sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
 
@@ -70,16 +79,23 @@ def ShellRunner() -> Error:
                     message = "Error to dump\n"
                     code = 406
                 message += "\n" + str(e)
+                print("Error: " + str(e))
+                numbersOfDumpsError += 1
+            else:
+                numbersOfDumpsSuccess += 1
+                print("Dump success")
 
             print("Executed: " + sql.getNameDataBase() + "\n")
 
-        elif f is not None and f.getExtension() != "sql":
+            numbersOfDumps += 1
+
+        elif f is not None and f.getExtension() != "sql":  # if the file is not a sql file
             if success:
                 success = False
                 message = "Error: not a sql file\n"
                 code = 405
             message += "\n" + f.getName() + " is not a sql file"
-        else:
+        else:  # if the file is not found
             if success:
                 success = False
                 message = "Error to dump\n"
@@ -88,4 +104,10 @@ def ShellRunner() -> Error:
             print("Error: folder " + folder + " is not a database dump")
 
     print("Dump finished")
-    return Error(success, message, code)
+
+    data: str = "@space-> Dumps: " + str(numbersOfDumps) + "\n" + \
+                "@space-> Dumps success: " + str(numbersOfDumpsSuccess) + "\n" + \
+                "@space-> Dumps error: " + str(numbersOfDumpsError) + "\n" + \
+                "@space-> Files: " + str(numbersOfFiles)
+
+    return Error(success=success, message=message + "\n" + data, code=code)

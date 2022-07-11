@@ -38,6 +38,7 @@ class Calendar(ABC):
         """
         self.Date.setActualWeekDay()
 
+    @abstractmethod
     def __str__(self) -> str:
         """
         String representation of the class Calendar
@@ -47,6 +48,7 @@ class Calendar(ABC):
                "Title: " + self.Title + "\n" + \
                "Description: " + self.Description + "\n"
 
+    @abstractmethod
     def __eq__(self, other) -> bool:
         """
         Compare two calendars
@@ -55,7 +57,7 @@ class Calendar(ABC):
         """
         # if other is a Calendar
         if isinstance(other, Calendar):
-            return self.Date == other.Date \
+            return self.Date.__eq__(other.Date) \
                    and self.Title == other.Title \
                    and self.Description == other.Description
         else:

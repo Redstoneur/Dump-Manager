@@ -45,9 +45,9 @@ class ErrorCalendar(Calendar):
         return "Date: " + self.Date.__str__() + "\n" + \
                "Title: " + self.Title + "\n" + \
                "Description: " + self.Description + "\n" + \
-               "Content: " + self.content + "\n" \
-               "Start: " + self.start.__str__() + "\n" \
-               "End: " + self.end.__str__() + "\n"
+               "Start: " + self.start.__str__() + "\n" + \
+               "End: " + self.end.__str__() + "\n" + \
+               "Content: " + self.content + "\n"
 
     def __eq__(self, other) -> bool:
         """
@@ -56,11 +56,11 @@ class ErrorCalendar(Calendar):
         :return: bool
         """
         if isinstance(other, ErrorCalendar):
-            return self.Date == other.Date \
+            return self.Date.__eq__(other.Date) \
                    and self.Title == other.Title \
                    and self.Description == other.Description \
                    and self.content == other.content \
-                   and self.start == other.start \
-                   and self.end == other.end
+                   and self.start.__eq__(other.start) \
+                   and self.end.__eq__(other.end)
         else:
             return False

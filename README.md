@@ -21,15 +21,19 @@ It simplifies to add a new dump in the database and to manage it.
 ## Dump-Manager-Configuration
 
 To configure Dump-Manager, you need to implement the JSON-file `./Data/Database-Information.json`
+
 ```json
 {
   "host": "address of the database",
   "port": "port of the database",
   "user": "user of the database",
   "password": "password of the database",
-  "name": "name of the database", // optional if you use a specific database and you use the DatabaseRunner
-  "path-dumps": "path of the dumps", // optional if you use a specific folder for the dumps
-  "script-dumps": "command to execute to create a dump", // optional if you use a specific command for the dumps and you use the ShellRunner
+  "name": "name of the database",
+  // optional if you use a specific database and you use the DatabaseRunner
+  "path-dumps": "path of the dumps",
+  // optional if you use a specific folder for the dumps
+  "script-dumps": "command to execute to create a dump"
+  // optional if you use a specific command for the dumps and you use the ShellRunner
 }
 ```
 
@@ -54,6 +58,5 @@ To use Dump-Manager, you need to put dumps in the folder `./Data/Dumps`
 
 3. What is the current version of the project
 
-    - the current version is 1.1.0
-
+    - the current version is 1.1.9
 
