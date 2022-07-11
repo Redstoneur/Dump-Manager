@@ -39,4 +39,4 @@ class dumpSqlFile(SqlFile):
         get the date of the dump
         :return: str, the date of the dump
         """
-        return str(self.dateOfDump.Day) + "-" + str(self.dateOfDump.Month) + "-" + str(self.dateOfDump.Year)
+        return self.dateOfDump.getDayString() + "-" + self.dateOfDump.getMonthString() + "-" + self.dateOfDump.getYearString()

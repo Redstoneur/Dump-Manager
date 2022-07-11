@@ -12,6 +12,7 @@ from Utile.Calendar.Calendar import *
 class ErrorCalendar(Calendar):
     start: WeekDay = None
     end: WeekDay = None
+    timeLoaded: TimeTo = None
     content: str = ""
 
     def __init__(self, title: str, description: str = "",
@@ -37,6 +38,8 @@ class ErrorCalendar(Calendar):
         else:
             self.end = end
 
+        self.timeLoaded = self.start.dateTime.differanceInTimeTo(self.end.dateTime)
+
     def __str__(self) -> str:
         """
         String representation of the class ErrorCalendar
@@ -47,6 +50,7 @@ class ErrorCalendar(Calendar):
                "Description: " + self.Description + "\n" + \
                "Start: " + self.start.__str__() + "\n" + \
                "End: " + self.end.__str__() + "\n" + \
+               "Time loaded: " + self.timeLoaded.__str__() + "\n" + \
                "Content: " + self.content + "\n"
 
     def __eq__(self, other) -> bool:
@@ -64,3 +68,21 @@ class ErrorCalendar(Calendar):
                    and self.end.__eq__(other.end)
         else:
             return False
+
+    def setStart(self, start: WeekDay) -> None:
+        """
+        Set the start of the error
+        :param start: WeekDay
+        :return: None
+        """
+        self.start = start
+        self.timeLoaded = self.start.dateTime.differanceInTimeTo(self.end.dateTime)
+
+    def setEnd(self, end: WeekDay) -> None:
+        """
+        Set the end of the error
+        :param end: WeekDay
+        :return: None
+        """
+        self.end = end
+        self.timeLoaded = self.start.dateTime.differanceInTimeTo(self.end.dateTime)

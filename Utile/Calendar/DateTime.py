@@ -1,5 +1,4 @@
-from Utile.Calendar.Date import *
-from Utile.Calendar.Time import *
+from Utile.Calendar.TimeTo import *
 
 
 ######################################################################################################################
@@ -45,6 +44,23 @@ class DateTime:
             return self.Date == other.Date and self.Time == other.Time
         else:
             return False
+
+    def differanceInTimeTo(self, other) -> TimeTo | None:
+        """
+        Calculate the difference between two dates and times
+        :param other: DateTime
+        :return: TimeTo
+        """
+        # if other is a DateTime
+        if isinstance(other, DateTime):
+            # calculate the difference of days
+            numberOfDays: int = self.Date.differenceInDays(other.Date)
+            # calculate the difference of the time
+            time: Time = self.Time.differenceInTime(other.Time)
+            # return the difference of time
+            return combineDayAndTimeInTimeTo(numberOfDays, time)
+        else:
+            return None
 
 
 ######################################################################################################################
