@@ -5,7 +5,7 @@ from Utile import *
 ############################## Calendar File Manager #################################################################
 ######################################################################################################################
 
-def CalendarFileManager(start: WeekDay, error: Error) -> Error:
+def CalendarFileManager(start: WeekDay, error: Error, graphique: bool) -> Error:
     """
     Create and modify a file with a Calendar of the last dump
     :param error: Error, error object
@@ -29,22 +29,8 @@ def CalendarFileManager(start: WeekDay, error: Error) -> Error:
         if isinstance(f, TxtFile) and b:  # if the file is a TxtFile
             txt: TxtFile = TxtFile(path=f.getPath())  # create a TxtFile object with the file
 
-
-
-            # create the content of calendar
-
-            space: str = " " * len("Content: ")
-            content: str = "\n" + \
-                           space + "- success: " + str(error.success) + "\n" + \
-                           space + "- " + error.get_message(space) + "\n" + \
-                           space + "- code: " + str(error.code) + "\n"
-
             # create the calendar of the last dump
-            calendar: ErrorCalendar = ErrorCalendar(title="Dumps",
-                                                    description="Dumps of the databases",
-                                                    date=start.dateTime.Date,
-                                                    start=start,
-                                                    content=content)  # create a Calendar object with the error
+            calendar: ErrorCalendar = CreateCalendar(start=start, error=error, graphique=graphique)
 
             if txt.data == "":  # if not have data in the file
                 # put the Calendar in the file
@@ -76,3 +62,28 @@ def CalendarFileManager(start: WeekDay, error: Error) -> Error:
     print("\n")
 
     return result
+
+
+def CreateCalendar(start: WeekDay, error: Error, graphique: bool) -> ErrorCalendar:
+    """
+    Create and modify a file with a Calendar of the last dump
+    :param error: Error, error object
+    :return: None
+    """
+    # create the content of calendar
+    space: str = " " * len("Content: ")
+    grapher: str = space + "Mode graphique\n" if graphique else space + "Mode console\n"
+    content: str = "\n" + \
+                   grapher + \
+                   space + "- success: " + str(error.success) + "\n" + \
+                   space + "- " + error.get_message(space) + "\n" + \
+                   space + "- code: " + str(error.code) + "\n"
+
+    # create the calendar of the last dump
+    calendar: ErrorCalendar = ErrorCalendar(title="Dumps",
+                                            description="Dumps of the databases",
+                                            date=start.dateTime.Date,
+                                            start=start,
+                                            content=content)  # create a Calendar object with the error
+
+    return calendar

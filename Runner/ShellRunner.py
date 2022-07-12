@@ -23,7 +23,7 @@ elif "@user" not in shellStartCommand or "@pw" not in shellStartCommand or "@dum
     sys.exit(2)
 
 
-def ShellRunner() -> Error:
+def ShellRunner(loadDumps: str = 'all dumps') -> Error:
     """
     dump all databases with a shell command
     :return: bool, True if the program worked, False if not
@@ -35,6 +35,7 @@ def ShellRunner() -> Error:
     numbersOfDumpsSuccess: int = 0
     numbersOfDumpsError: int = 0
     numbersOfFiles: int = 0
+    listOfDumps: list[str] = []
     success: bool = True
     message: str = "success"
     code: int = 200
@@ -53,6 +54,11 @@ def ShellRunner() -> Error:
         if f is not None and f.getExtension() == "sql":  # if the file is a sql file
 
             sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
+
+            if loadDumps != "all dumps" and loadDumps != sql.getNameDataBase():
+                continue
+            else:
+                listOfDumps += [sql.getNameDataBase()]
 
             print("Dumping: " + sql.getNameDataBase() + " (Date of dump: " + sql.getDateOfDump() + ")")
 
@@ -105,9 +111,30 @@ def ShellRunner() -> Error:
 
     print("Dump finished")
 
-    data: str = "@space-> Dumps: " + str(numbersOfDumps) + "\n" + \
-                "@space-> Dumps success: " + str(numbersOfDumpsSuccess) + "\n" + \
-                "@space-> Dumps error: " + str(numbersOfDumpsError) + "\n" + \
-                "@space-> Files: " + str(numbersOfFiles)
+    if loadDumps != "all dumps":
+        data: str = "@space-> Dump: " + listOfDumps[0]
+    else:
+        data: str = "@space-> Dumps: " + str(listOfDumps) + "\n" + \
+                    "@space-> Dumps: " + str(numbersOfDumps) + "\n" + \
+                    "@space-> Dumps success: " + str(numbersOfDumpsSuccess) + "\n" + \
+                    "@space-> Dumps error: " + str(numbersOfDumpsError) + "\n" + \
+                    "@space-> Files: " + str(numbersOfFiles)
 
     return Error(success=success, message=message + "\n" + data, code=code)
+
+
+def ListOfDumps() -> list[str]:
+    """
+    list all dumps in the folder
+    :return: list[str], list of all dumps in the folder
+    """
+    listOfDumps: list[str] = ['all dumps']
+    for folder in FoldersContained.folders:
+        if folder == "Dumps.md":
+            continue
+        else:
+            f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
+            if f is not None and f.getExtension() == "sql":  # if the file is a sql file
+                sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
+                listOfDumps += [sql.getNameDataBase()]
+    return listOfDumps
