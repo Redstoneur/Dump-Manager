@@ -34,6 +34,7 @@ def fenetre(run: str = "nothing") -> Error:
     labelTitre: tk.Label
     labelTitreSubligne: tk.Label
     ComboboxDumps: tk.Listbox
+    loadingLabel: tk.Label
     errorLabel: tk.Label
     RunButton: tk.Button
     ReloadButton: tk.Button
@@ -72,15 +73,18 @@ def fenetre(run: str = "nothing") -> Error:
 
         # create a button to run the program
         RunButton = tk.Button(window, text="Run",
-                              command=lambda: Run(errorLabel=errorLabel,
-                                                  loadDumps=ComboboxDumps.get(ComboboxDumps.curselection()), run=run)
-                              )
+                              command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
+                                                  loadDumps=ComboboxDumps.get(ComboboxDumps.curselection()), run=run))
         RunButton.grid(row=3, column=0, columnspan=int(grid_columnconfigure_Max / 2), sticky="nsew")
 
         # create a button to reload the list of dumps
         ReloadButton = tk.Button(window, text="Reload", command=lambda: Reload(listeDumps=ComboboxDumps))
         ReloadButton.grid(row=3, column=int(grid_columnconfigure_Max / 2), columnspan=int(grid_columnconfigure_Max / 2),
                           sticky="nsew")
+
+        # relative information label
+        loadingLabel = tk.Label(window, text=" ", justify=tk.CENTER)
+        loadingLabel.grid(row=4, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
 
         # create a label to display the error
         errorLabel = tk.Label(window, text="", justify=tk.LEFT, anchor=tk.W)
@@ -107,7 +111,7 @@ def Reload(listeDumps: tk.Listbox) -> None:
     listeDumps.selection_set(0)
 
 
-def Run(errorLabel: tk.Label, loadDumps: str = 'all dumps', run: str = "nothing") -> None:
+def Run(errorLabel: tk.Label, loadingLabel: tk.Label, loadDumps: str = 'all dumps', run: str = "nothing") -> None:
     """
     display the error in the label
     :param run: str, information or dump
@@ -115,12 +119,15 @@ def Run(errorLabel: tk.Label, loadDumps: str = 'all dumps', run: str = "nothing"
     :return: None
     """
     start: WeekDay = getActualWeekDay()
-    error: Error = Runner(loadDumps=loadDumps, run=run, graphique=False)
+    error: Error = Runner(loadingLabel=loadingLabel, loadDumps=loadDumps, run=run)
     calendar: ErrorCalendar = CreateCalendar(start=start, error=error, graphique=True)
+    loadingLabel.config(text=" ")
+    loadingLabel.update()
     errorLabel.config(text=calendar.__str__())
+    errorLabel.update()
 
 
-def Runner(loadDumps: str = 'all dumps', run: str = "nothing", graphique: bool = False) -> Error:
+def Runner(loadingLabel: tk.Label=None, loadDumps: str = 'all dumps', run: str = "nothing", graphique: bool = False) -> Error:
     """
     Run the program
     :param run: str, information or dump
@@ -138,7 +145,7 @@ def Runner(loadDumps: str = 'all dumps', run: str = "nothing", graphique: bool =
                 print("\nDebug mode N1")
                 error = Error(success=True, message="Debug mode N1", code=2109)
             if run == "shell":  # if run shell
-                error = ShellRunner(loadDumps=loadDumps)
+                error = ShellRunner(loadingLabel=loadingLabel, loadDumps=loadDumps)
             else:  # if run nothing
                 error = Error(success=False, message="run not found", code=3)
         else:  # if not read information

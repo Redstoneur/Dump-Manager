@@ -1,4 +1,5 @@
 import sys
+import tkinter as tk
 from Utile import *
 
 ######################################################################################################################
@@ -23,7 +24,7 @@ elif "@user" not in shellStartCommand or "@pw" not in shellStartCommand or "@dum
     sys.exit(2)
 
 
-def ShellRunner(loadDumps: str = 'all dumps') -> Error:
+def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> Error:
     """
     dump all databases with a shell command
     :return: bool, True if the program worked, False if not
@@ -31,22 +32,26 @@ def ShellRunner(loadDumps: str = 'all dumps') -> Error:
     print("Dump started")
 
     error: Error
+    listOfDumps: list[str] = []
     numbersOfDumps: int = 0
+    listOfDumpsSuccess: list[str] = []
     numbersOfDumpsSuccess: int = 0
+    listOfDumpsError: list[str] = []
     numbersOfDumpsError: int = 0
     numbersOfFiles: int = 0
-    listOfDumps: list[str] = []
+
     success: bool = True
     message: str = "success"
     code: int = 200
 
     # get all dumps in the folder and add them to the server with a shell command to load the dump in the database
     for folder in FoldersContained.folders:
-        numbersOfFiles += 1
 
         # don't read Dumps.md
         if folder == "Dumps.md":
             continue
+        else:
+            numbersOfFiles += 1
 
         # create variables file to use in shell command of dump
         f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
@@ -58,7 +63,9 @@ def ShellRunner(loadDumps: str = 'all dumps') -> Error:
             if loadDumps != "all dumps" and loadDumps != sql.getNameDataBase():
                 continue
             else:
-                listOfDumps += [sql.getNameDataBase()]
+                if loadingLabel is not None:
+                    loadingLabel.config(text="Dump in running: " + sql.getNameDataBase())
+                    loadingLabel.update()
 
             print("Dumping: " + sql.getNameDataBase() + " (Date of dump: " + sql.getDateOfDump() + ")")
 
@@ -87,13 +94,17 @@ def ShellRunner(loadDumps: str = 'all dumps') -> Error:
                 message += "\n" + str(e)
                 print("Error: " + str(e))
                 numbersOfDumpsError += 1
+                listOfDumpsError += [sql.getNameDataBase()]
             else:
                 numbersOfDumpsSuccess += 1
+                listOfDumpsSuccess += [sql.getNameDataBase()]
                 print("Dump success")
 
             print("Executed: " + sql.getNameDataBase() + "\n")
 
             numbersOfDumps += 1
+            listOfDumps += [sql.getNameDataBase()]
+
 
         elif f is not None and f.getExtension() != "sql":  # if the file is not a sql file
             if success:
@@ -114,10 +125,9 @@ def ShellRunner(loadDumps: str = 'all dumps') -> Error:
     if loadDumps != "all dumps":
         data: str = "@space-> Dump: " + listOfDumps[0]
     else:
-        data: str = "@space-> Dumps: " + str(listOfDumps) + "\n" + \
-                    "@space-> Dumps: " + str(numbersOfDumps) + "\n" + \
-                    "@space-> Dumps success: " + str(numbersOfDumpsSuccess) + "\n" + \
-                    "@space-> Dumps error: " + str(numbersOfDumpsError) + "\n" + \
+        data: str = "@space-> Dumps: " +str(numbersOfDumps) + " | " + str(listOfDumps) + "\n" + \
+                    "@space-> Dumps success: " + str(numbersOfDumpsSuccess) + " | " + str(listOfDumpsSuccess) + "\n" + \
+                    "@space-> Dumps error: " + str(numbersOfDumpsError) + " | " + str(listOfDumpsError) + "\n" + \
                     "@space-> Files: " + str(numbersOfFiles)
 
     return Error(success=success, message=message + "\n" + data, code=code)
