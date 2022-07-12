@@ -43,7 +43,7 @@ def fenetre(run: str = "nothing") -> Error:
     longueur: int = 500
     hauteur: int = 500
 
-    grid_rowconfigure_Max: int = 6
+    grid_rowconfigure_Max: int = 7
     grid_columnconfigure_Max: int = 4
 
     try:
@@ -67,7 +67,7 @@ def fenetre(run: str = "nothing") -> Error:
         labelTitreSubligne.grid(row=1, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
 
         # Select List
-        ComboboxDumps = tk.Listbox(window)
+        ComboboxDumps = tk.Listbox(window, justify="center")
         Reload(listeDumps=ComboboxDumps)
         ComboboxDumps.grid(row=2, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
 
@@ -89,6 +89,21 @@ def fenetre(run: str = "nothing") -> Error:
         # create a label to display the error
         errorLabel = tk.Label(window, text="", justify=tk.LEFT, anchor=tk.W)
         errorLabel.grid(row=5, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+
+        # label Author
+        labelAuthor = tk.Label(window, text=ApplicationInformation.get_author())
+        labelAuthor.config(font=("Arial", 7))
+        labelAuthor.grid(row=6, column=0, sticky="sw")
+
+        # label Copyright
+        labelCopyright = tk.Label(window, text=ApplicationInformation.email)
+        labelCopyright.config(font=("Arial", 7))
+        labelCopyright.grid(row=6, column=1, columnspan=2, sticky="s")
+
+        # label version
+        labelVersion = tk.Label(window, text="v" + ApplicationInformation.version)
+        labelVersion.config(font=("Arial", 7))
+        labelVersion.grid(row=6, column=grid_columnconfigure_Max - 1, sticky="se")
 
         window.mainloop()
     except Exception as e:
@@ -127,7 +142,8 @@ def Run(errorLabel: tk.Label, loadingLabel: tk.Label, loadDumps: str = 'all dump
     errorLabel.update()
 
 
-def Runner(loadingLabel: tk.Label=None, loadDumps: str = 'all dumps', run: str = "nothing", graphique: bool = False) -> Error:
+def Runner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps', run: str = "nothing",
+           graphique: bool = False) -> Error:
     """
     Run the program
     :param run: str, information or dump

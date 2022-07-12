@@ -30,6 +30,7 @@ def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> 
     :return: bool, True if the program worked, False if not
     """
     print("Dump started")
+    numbersOfDumpsTheoretical: int = NumberOfDumps()
 
     error: Error
     listOfDumps: list[str] = []
@@ -63,8 +64,13 @@ def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> 
             if loadDumps != "all dumps" and loadDumps != sql.getNameDataBase():
                 continue
             else:
+                numbersOfDumps += 1
+                listOfDumps += [sql.getNameDataBase()]
                 if loadingLabel is not None:
-                    loadingLabel.config(text="Dump in running: " + sql.getNameDataBase())
+                    text: str = "Dump in running: " + sql.getNameDataBase()
+                    if loadDumps == "all dumps":
+                        text += " (" + str(numbersOfDumps) + "/" + str(numbersOfDumpsTheoretical) + ")"
+                    loadingLabel.config(text=text)
                     loadingLabel.update()
 
             print("Dumping: " + sql.getNameDataBase() + " (Date of dump: " + sql.getDateOfDump() + ")")
@@ -102,9 +108,6 @@ def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> 
 
             print("Executed: " + sql.getNameDataBase() + "\n")
 
-            numbersOfDumps += 1
-            listOfDumps += [sql.getNameDataBase()]
-
 
         elif f is not None and f.getExtension() != "sql":  # if the file is not a sql file
             if success:
@@ -125,7 +128,7 @@ def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> 
     if loadDumps != "all dumps":
         data: str = "@space-> Dump: " + listOfDumps[0]
     else:
-        data: str = "@space-> Dumps: " +str(numbersOfDumps) + " | " + str(listOfDumps) + "\n" + \
+        data: str = "@space-> Dumps: " + str(numbersOfDumps) + " | " + str(listOfDumps) + "\n" + \
                     "@space-> Dumps success: " + str(numbersOfDumpsSuccess) + " | " + str(listOfDumpsSuccess) + "\n" + \
                     "@space-> Dumps error: " + str(numbersOfDumpsError) + " | " + str(listOfDumpsError) + "\n" + \
                     "@space-> Files: " + str(numbersOfFiles)
@@ -148,3 +151,19 @@ def ListOfDumps() -> list[str]:
                 sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
                 listOfDumps += [sql.getNameDataBase()]
     return listOfDumps
+
+
+def NumberOfDumps() -> int:
+    """
+    number of dumps in the folder
+    :return: int, number of dumps in the folder
+    """
+    numbersOfDumps: int = 0
+    for folder in FoldersContained.folders:
+        if folder == "Dumps.md":
+            continue
+        else:
+            f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
+            if f is not None and f.getExtension() == "sql":  # if the file is a sql file
+                numbersOfDumps += 1
+    return numbersOfDumps

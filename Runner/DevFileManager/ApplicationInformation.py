@@ -18,6 +18,7 @@ class ApplicationInformation:
     description: str
     author_first_name: str
     author_last_name: str
+    email: str
 
     def __init__(self, file_path: str):
         """
@@ -38,6 +39,8 @@ class ApplicationInformation:
         self.author_first_name: str = self.get("author")["firstName"]
         # noinspection PyTypeChecker
         self.author_last_name: str = self.get("author")["lastName"]
+        # noinspection PyTypeChecker
+        self.email: str = self.get("author")["email"]
 
     def get(self, key: str) -> object:
         """
@@ -121,3 +124,11 @@ class ApplicationInformation:
         """
 
         return self.author_first_name + " " + self.author_last_name
+
+    def get_email(self) -> str:
+        """
+        get email of the author
+        :return: str, email of the author
+        """
+
+        return self.email
