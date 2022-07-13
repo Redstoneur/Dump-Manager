@@ -23,7 +23,6 @@ elif "@user" not in shellStartCommand or "@pw" not in shellStartCommand or "@dum
     print(Error(success=False, message="Error: not have @user, @pw, @dump in shellStartCommand", code=2).__str__())
     sys.exit(2)
 
-
 def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> Error:
     """
     dump all databases with a shell command
@@ -31,6 +30,7 @@ def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> 
     """
     print("Dump started")
     numbersOfDumpsTheoretical: int = NumberOfDumps()
+    FoldersContained.update()
 
     error: Error
     listOfDumps: list[str] = []
@@ -141,6 +141,7 @@ def ListOfDumps() -> list[str]:
     list all dumps in the folder
     :return: list[str], list of all dumps in the folder
     """
+    FoldersContained.update()
     listOfDumps: list[str] = ['all dumps']
     for folder in FoldersContained.folders:
         if folder == "Dumps.md":
@@ -149,7 +150,7 @@ def ListOfDumps() -> list[str]:
             f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
             if f is not None and f.getExtension() == "sql":  # if the file is a sql file
                 sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
-                listOfDumps += [sql.getNameDataBase()]
+                listOfDumps += [sql.getNameDataBase()+" ("+sql.getDateOfDump()+")"]
     return listOfDumps
 
 
@@ -159,6 +160,7 @@ def NumberOfDumps() -> int:
     :return: int, number of dumps in the folder
     """
     numbersOfDumps: int = 0
+    FoldersContained.update()
     for folder in FoldersContained.folders:
         if folder == "Dumps.md":
             continue

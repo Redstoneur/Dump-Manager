@@ -1,81 +1,9 @@
-import tkinter as tk
-import platform as plt
 from Runner.DevFileManager import *
 from Runner.ShellRunner import *
+from Runner.UtileFonction import *
+
 
 # from Runner.DbRunner import *
-
-ApplicationInformation: ApplicationInformation = ApplicationInformation("./Data/package.json")
-my_os: str = plt.system()
-
-
-def CleanTerminal() -> None:
-    """
-    clean the terminal
-    :return: None
-    """
-    if my_os == "Windows":
-        os.system("cls")
-    else:
-        os.system("clear")
-
-
-def AddDump(textfieldPath: tk.Text, listeDumps: tk.Listbox) -> None:
-    """
-    add a dump in the list of dumps
-    :param textfieldPath: str, path of the dump
-    :return: None
-    """
-    path: str = textfieldPath.get("1.0", "end-1c")
-    # if the path is not folder
-    if not os.path.isdir(path):
-        # if the path is a file
-        if os.path.isfile(path):
-            # if the file is a dump
-            if isDumpSqlFile(path):
-                # add the dump in the list of dumps
-                moveFile(file=path, folder=DumpsPath)
-                Reload(listeDumps=listeDumps)
-                # clear the textfield
-                textfieldPath.delete("1.0", "end-1c")
-                textfieldPath.insert(tk.END, "C:/Users/alipio.simoes/Downloads/")
-            else:
-                print("Error: not a dump")
-        else:
-            print("Error: file not found")
-    else:
-        print("Error: folder not found")
-
-
-
-def Reload(listeDumps: tk.Listbox) -> None:
-    """
-    reload the list of dumps
-    :param listeDumps: list, list of dumps
-    :return: None
-    """
-    listeDumps.delete(0, tk.END)
-    listOfDumps = ListOfDumps()
-    for i in range(len(listOfDumps)):
-        listeDumps.insert(i, listOfDumps[i])
-    listeDumps.selection_set(0)
-
-
-def information() -> bool:
-    """
-    print information about the program
-    :return: bool, True if the program worked, False if not
-    """
-
-    # if have information
-    if ApplicationInformation.haveData():
-        # print information about the program
-        print("\n" + ApplicationInformation.__str__() + "\n")
-        return True
-
-    else:  # if don't have information
-        print("Error: information")
-        return False
 
 
 def fenetre(run: str = "nothing") -> Error:
@@ -110,7 +38,7 @@ def fenetre(run: str = "nothing") -> Error:
     grid_columnconfigure_Max: int = 3
 
     try:
-        window.title(ApplicationInformation.name + " " + ApplicationInformation.version)
+        window.title(ApplicationInformation.get_name() + " " + ApplicationInformation.get_version())
         window.geometry(str(longueur) + "x" + str(hauteur))
 
         for i in range(grid_rowconfigure_Max):
@@ -123,7 +51,7 @@ def fenetre(run: str = "nothing") -> Error:
         row: int = 0
 
         # label titre
-        labelTitre = tk.Label(window, text=ApplicationInformation.name)
+        labelTitre = tk.Label(window, text=ApplicationInformation.get_name())
         labelTitre.config(font=("Courier", 20))
         labelTitre.grid(row=row, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
 
@@ -131,7 +59,7 @@ def fenetre(run: str = "nothing") -> Error:
         row += 1
 
         # label subtitle
-        labelTitreSubligne = tk.Label(window, text=ApplicationInformation.version)
+        labelTitreSubligne = tk.Label(window, text=ApplicationInformation.get_version())
         labelTitreSubligne.config(font=("Courier", 10))
         labelTitreSubligne.grid(row=row, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
 
@@ -145,10 +73,11 @@ def fenetre(run: str = "nothing") -> Error:
         # path textfield
         textfieldPath = tk.Text(window, height=1, width=30)
         textfieldPath.insert(tk.END, "C:/Users/alipio.simoes/Downloads/")
-        textfieldPath.grid(row=row, column=1, sticky="")
+        textfieldPath.grid(row=row, column=1, sticky="we")
 
         # use textfield button
-        useTextfieldButton = tk.Button(window, text="Use", command=lambda: AddDump(textfieldPath=textfieldPath, listeDumps=ComboboxDumps))
+        useTextfieldButton = tk.Button(window, text="Use",
+                                       command=lambda: AddDump(textfieldPath=textfieldPath, listeDumps=ComboboxDumps))
         useTextfieldButton.grid(row=row, column=2, sticky="we")
 
         # position
@@ -199,12 +128,12 @@ def fenetre(run: str = "nothing") -> Error:
         labelAuthor.grid(row=row, column=0, sticky="sw")
 
         # label Copyright
-        labelCopyright = tk.Label(window, text=ApplicationInformation.email)
+        labelCopyright = tk.Label(window, text=ApplicationInformation.get_email())
         labelCopyright.config(font=("Arial", 7))
         labelCopyright.grid(row=row, column=1, sticky="s")
 
         # label version
-        labelVersion = tk.Label(window, text="v" + ApplicationInformation.version)
+        labelVersion = tk.Label(window, text="v" + ApplicationInformation.get_version())
         labelVersion.config(font=("Arial", 7))
         labelVersion.grid(row=row, column=grid_columnconfigure_Max - 1, sticky="se")
 
@@ -219,6 +148,9 @@ def fenetre(run: str = "nothing") -> Error:
 def Run(errorLabel: tk.Label, loadingLabel: tk.Label, loadDumps: str = 'all dumps', run: str = "nothing") -> None:
     """
     display the error in the label
+    :param errorLabel: tk.Label, label to display the error
+    :param loadingLabel: tk.Label, label to display the loading
+    :param loadDumps: str, dump to load
     :param run: str, information or dump
     :param errorLabel: tk.Label, label to display the error
     :return: None
@@ -236,6 +168,8 @@ def Runner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps', run: str
            graphique: bool = False) -> Error:
     """
     Run the program
+    :param loadingLabel: tk.Label, label to display the error
+    :param loadDumps: str, information or dump
     :param run: str, information or dump
     :param graphique: bool, if the program is run in graphique mode
     :return: Error, error object
@@ -252,7 +186,7 @@ def Runner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps', run: str
             if run == "debugN1":  # if run in debug mode
                 print("\nDebug mode N1")
                 error = Error(success=True, message="Debug mode N1", code=2109)
-            if run == "shell":  # if run shell
+            elif run == "shell":  # if run shell
                 error = ShellRunner(loadingLabel=loadingLabel, loadDumps=loadDumps)
             else:  # if run nothing
                 error = Error(success=False, message="run not found", code=3)

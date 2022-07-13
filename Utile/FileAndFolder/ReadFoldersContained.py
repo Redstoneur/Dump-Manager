@@ -34,3 +34,12 @@ class FoldersContained:
         :return: path to the folder containing files to read
         """
         return self.path
+
+    def update(self, path: str = None) -> None:
+        """
+        :param path: path to the folder containing files to read
+        :return:
+        """
+        if path is not None:
+            self.path = path
+        self.readFoldersContained()
