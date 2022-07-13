@@ -58,5 +58,5 @@ To use Dump-Manager, you need to put dumps in the folder `./Data/Dumps`
 
 3. What is the current version of the project
 
-    - the current version is 1.2.2
+    - the current version is 1.2.3
 

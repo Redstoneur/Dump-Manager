@@ -1,9 +1,64 @@
 import tkinter as tk
+import platform as plt
 from Runner.DevFileManager import *
 from Runner.ShellRunner import *
-from Runner.DbRunner import *
+
+# from Runner.DbRunner import *
 
 ApplicationInformation: ApplicationInformation = ApplicationInformation("./Data/package.json")
+my_os: str = plt.system()
+
+
+def CleanTerminal() -> None:
+    """
+    clean the terminal
+    :return: None
+    """
+    if my_os == "Windows":
+        os.system("cls")
+    else:
+        os.system("clear")
+
+
+def AddDump(textfieldPath: tk.Text, listeDumps: tk.Listbox) -> None:
+    """
+    add a dump in the list of dumps
+    :param textfieldPath: str, path of the dump
+    :return: None
+    """
+    path: str = textfieldPath.get("1.0", "end-1c")
+    # if the path is not folder
+    if not os.path.isdir(path):
+        # if the path is a file
+        if os.path.isfile(path):
+            # if the file is a dump
+            if isDumpSqlFile(path):
+                # add the dump in the list of dumps
+                moveFile(file=path, folder=DumpsPath)
+                Reload(listeDumps=listeDumps)
+                # clear the textfield
+                textfieldPath.delete("1.0", "end-1c")
+                textfieldPath.insert(tk.END, "C:/Users/alipio.simoes/Downloads/")
+            else:
+                print("Error: not a dump")
+        else:
+            print("Error: file not found")
+    else:
+        print("Error: folder not found")
+
+
+
+def Reload(listeDumps: tk.Listbox) -> None:
+    """
+    reload the list of dumps
+    :param listeDumps: list, list of dumps
+    :return: None
+    """
+    listeDumps.delete(0, tk.END)
+    listOfDumps = ListOfDumps()
+    for i in range(len(listOfDumps)):
+        listeDumps.insert(i, listOfDumps[i])
+    listeDumps.selection_set(0)
 
 
 def information() -> bool:
@@ -33,18 +88,26 @@ def fenetre(run: str = "nothing") -> Error:
 
     labelTitre: tk.Label
     labelTitreSubligne: tk.Label
-    ComboboxDumps: tk.Listbox
     loadingLabel: tk.Label
     errorLabel: tk.Label
+    LabelAddDump: tk.Label
+
+    textfieldPath: tk.Text
+
     RunButton: tk.Button
     ReloadButton: tk.Button
+    cleanTerminalButton: tk.Button
+    useTextfieldButton: tk.Button
+
+    ComboboxDumps: tk.Listbox
+
     error: Error
 
     longueur: int = 500
     hauteur: int = 500
 
-    grid_rowconfigure_Max: int = 7
-    grid_columnconfigure_Max: int = 4
+    grid_rowconfigure_Max: int = 8
+    grid_columnconfigure_Max: int = 3
 
     try:
         window.title(ApplicationInformation.name + " " + ApplicationInformation.version)
@@ -56,54 +119,94 @@ def fenetre(run: str = "nothing") -> Error:
         for i in range(grid_columnconfigure_Max):
             window.grid_columnconfigure(i, weight=1)
 
+        # position
+        row: int = 0
+
         # label titre
         labelTitre = tk.Label(window, text=ApplicationInformation.name)
         labelTitre.config(font=("Courier", 20))
-        labelTitre.grid(row=0, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+        labelTitre.grid(row=row, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+
+        # position
+        row += 1
 
         # label subtitle
         labelTitreSubligne = tk.Label(window, text=ApplicationInformation.version)
         labelTitreSubligne.config(font=("Courier", 10))
-        labelTitreSubligne.grid(row=1, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+        labelTitreSubligne.grid(row=row, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+
+        # position
+        row += 1
+
+        # label add dump
+        LabelAddDump = tk.Label(window, text="Add dump:")
+        LabelAddDump.grid(row=row, column=0, sticky="we")
+
+        # path textfield
+        textfieldPath = tk.Text(window, height=1, width=30)
+        textfieldPath.insert(tk.END, "C:/Users/alipio.simoes/Downloads/")
+        textfieldPath.grid(row=row, column=1, sticky="")
+
+        # use textfield button
+        useTextfieldButton = tk.Button(window, text="Use", command=lambda: AddDump(textfieldPath=textfieldPath, listeDumps=ComboboxDumps))
+        useTextfieldButton.grid(row=row, column=2, sticky="we")
+
+        # position
+        row += 1
 
         # Select List
         ComboboxDumps = tk.Listbox(window, justify="center")
         Reload(listeDumps=ComboboxDumps)
-        ComboboxDumps.grid(row=2, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+        ComboboxDumps.grid(row=row, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+
+        # position
+        row += 1
 
         # create a button to run the program
         RunButton = tk.Button(window, text="Run",
                               command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
                                                   loadDumps=ComboboxDumps.get(ComboboxDumps.curselection()), run=run))
-        RunButton.grid(row=3, column=0, columnspan=int(grid_columnconfigure_Max / 2), sticky="nsew")
+        RunButton.grid(row=row, column=0, sticky="nsew")
 
         # create a button to reload the list of dumps
         ReloadButton = tk.Button(window, text="Reload", command=lambda: Reload(listeDumps=ComboboxDumps))
-        ReloadButton.grid(row=3, column=int(grid_columnconfigure_Max / 2), columnspan=int(grid_columnconfigure_Max / 2),
-                          sticky="nsew")
+        ReloadButton.grid(row=row, column=1, sticky="nsew")
+
+        # create a button to clean the terminal
+        cleanTerminalButton = tk.Button(window, text="Clean Terminal", command=lambda: CleanTerminal())
+        cleanTerminalButton.grid(row=row, column=2, sticky="nsew")
+
+        # position
+        row += 1
 
         # relative information label
         loadingLabel = tk.Label(window, text=" ", justify=tk.CENTER)
-        loadingLabel.grid(row=4, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+        loadingLabel.grid(row=row, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+
+        # position
+        row += 1
 
         # create a label to display the error
         errorLabel = tk.Label(window, text="", justify=tk.LEFT, anchor=tk.W)
-        errorLabel.grid(row=5, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+        errorLabel.grid(row=row, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+
+        # position
+        row += 1
 
         # label Author
         labelAuthor = tk.Label(window, text=ApplicationInformation.get_author())
         labelAuthor.config(font=("Arial", 7))
-        labelAuthor.grid(row=6, column=0, sticky="sw")
+        labelAuthor.grid(row=row, column=0, sticky="sw")
 
         # label Copyright
         labelCopyright = tk.Label(window, text=ApplicationInformation.email)
         labelCopyright.config(font=("Arial", 7))
-        labelCopyright.grid(row=6, column=1, columnspan=2, sticky="s")
+        labelCopyright.grid(row=row, column=1, sticky="s")
 
         # label version
         labelVersion = tk.Label(window, text="v" + ApplicationInformation.version)
         labelVersion.config(font=("Arial", 7))
-        labelVersion.grid(row=6, column=grid_columnconfigure_Max - 1, sticky="se")
+        labelVersion.grid(row=row, column=grid_columnconfigure_Max - 1, sticky="se")
 
         window.mainloop()
     except Exception as e:
@@ -111,19 +214,6 @@ def fenetre(run: str = "nothing") -> Error:
         return Error(success=False, message=str(e), code=5)
     else:
         return Error(success=True, message="Mode graphique was successfully run", code=200)
-
-
-def Reload(listeDumps: tk.Listbox) -> None:
-    """
-    reload the list of dumps
-    :param listeDumps: list, list of dumps
-    :return: None
-    """
-    listeDumps.delete(0, tk.END)
-    listOfDumps = ListOfDumps()
-    for i in range(len(listOfDumps)):
-        listeDumps.insert(i, listOfDumps[i])
-    listeDumps.selection_set(0)
 
 
 def Run(errorLabel: tk.Label, loadingLabel: tk.Label, loadDumps: str = 'all dumps', run: str = "nothing") -> None:
@@ -150,6 +240,8 @@ def Runner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps', run: str
     :param graphique: bool, if the program is run in graphique mode
     :return: Error, error object
     """
+    CleanTerminal()
+
     error: Error
     start: WeekDay = getActualWeekDay()
 

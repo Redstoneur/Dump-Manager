@@ -40,3 +40,17 @@ class dumpSqlFile(SqlFile):
         :return: str, the date of the dump
         """
         return self.dateOfDump.getDayString() + "-" + self.dateOfDump.getMonthString() + "-" + self.dateOfDump.getYearString()
+
+
+######################################################################################################################
+############################## Special Functions #####################################################################
+######################################################################################################################
+
+def isDumpSqlFile(path: str) -> bool:
+    """
+    check if the file is a dump sql file
+    :param path: str, the path of the file
+    :return: bool, True if the file is a dump sql file, False if not
+    """
+    return path.split('.')[-1] == "sql"
+
