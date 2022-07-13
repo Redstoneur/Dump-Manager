@@ -8,14 +8,19 @@ ApplicationInformation: ApplicationInformation = ApplicationInformation("./Data/
 my_os: str = plt.system()
 
 
-def CleanTerminal() -> None:
+def CleanTerminal(errorLabel: tk.Label = None) -> None:
     """
     clean the terminal
     :return: None
     """
+    # if the errorLabel is not None
+    if errorLabel is not None:
+        errorLabel.config(text=" ")
+
+    # if the os is windows
     if my_os == "Windows":
         os.system("cls")
-    else:
+    else:  # if the os is linux
         os.system("clear")
 
 

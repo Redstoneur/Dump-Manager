@@ -102,7 +102,7 @@ def fenetre(run: str = "nothing") -> Error:
         ReloadButton.grid(row=row, column=1, sticky="nsew")
 
         # create a button to clean the terminal
-        cleanTerminalButton = tk.Button(window, text="Clean Terminal", command=lambda: CleanTerminal())
+        cleanTerminalButton = tk.Button(window, text="Clean Terminal", command=lambda: CleanTerminal(errorLabel=errorLabel))
         cleanTerminalButton.grid(row=row, column=2, sticky="nsew")
 
         # position
@@ -155,6 +155,8 @@ def Run(errorLabel: tk.Label, loadingLabel: tk.Label, loadDumps: str = 'all dump
     :param errorLabel: tk.Label, label to display the error
     :return: None
     """
+    if loadDumps != 'all dumps':
+        loadDumps = loadDumps.split(' ')[0]
     start: WeekDay = getActualWeekDay()
     error: Error = Runner(loadingLabel=loadingLabel, loadDumps=loadDumps, run=run)
     calendar: ErrorCalendar = CreateCalendar(start=start, error=error, graphique=True)

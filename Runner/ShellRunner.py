@@ -23,6 +23,7 @@ elif "@user" not in shellStartCommand or "@pw" not in shellStartCommand or "@dum
     print(Error(success=False, message="Error: not have @user, @pw, @dump in shellStartCommand", code=2).__str__())
     sys.exit(2)
 
+
 def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> Error:
     """
     dump all databases with a shell command
@@ -126,6 +127,8 @@ def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> 
     print("Dump finished")
 
     if loadDumps != "all dumps":
+        if len(listOfDumps) == 0:
+            listOfDumps = ["No dumps"]
         data: str = "@space-> Dump: " + listOfDumps[0]
     else:
         data: str = "@space-> Dumps: " + str(numbersOfDumps) + " | " + str(listOfDumps) + "\n" + \
