@@ -76,12 +76,12 @@ def fenetre(run: str = "nothing") -> Error:
 
             # label docker container
             LabelDockerContainer = tk.Label(window, text="Docker container:")
-            LabelDockerContainer.grid(row=row, column=0, sticky="nsew")
+            LabelDockerContainer.grid(row=row, column=0, sticky="we")
 
             # textfield docker container
             textfieldDockerContainer = tk.Text(window, height=1, width=20)
             textfieldDockerContainer.insert(tk.END, get_default_docker_container())
-            textfieldDockerContainer.grid(row=row, column=1, sticky="nsew")
+            textfieldDockerContainer.grid(row=row, column=1, sticky="we")
         else:
             # noinspection PyTypeChecker
             textfieldDockerContainer = None
