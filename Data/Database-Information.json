@@ -4,6 +4,6 @@
   "user": "",
   "password": "",
   "path-dumps": null,
-  "doker_container": "",
+  "doker_container": null,
   "script-dumps": null
 }

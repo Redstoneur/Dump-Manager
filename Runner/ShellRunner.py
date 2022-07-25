@@ -22,6 +22,10 @@ if shellStartCommand is None or shellStartCommand == "":
 elif "@user" not in shellStartCommand or "@pw" not in shellStartCommand or "@dump" not in shellStartCommand:
     print(Error(success=False, message="Error: not have @user, @pw, @dump in shellStartCommand", code=2).__str__())
     sys.exit(2)
+elif DatabaseInfo.get("doker_container") is not None and DatabaseInfo.get("doker_container") != "":
+    if "@doker_container" not in shellStartCommand:
+        print(Error(success=False, message="Error: not have @doker_container in shellStartCommand", code=3).__str__())
+        sys.exit(3)
 
 ignoredFiles: list[str] = [".Dumps.md", "lastDumpsFiles"]
 
@@ -97,10 +101,13 @@ def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> 
             # replace @dump with the path of the dump file
 
             # noinspection PyTypeChecker
-            command = shellStartCommand.replace("@user", DatabaseInfo.get("user"))
+            command = shellStartCommand.replace("@doker_container", DatabaseInfo.get("doker_container"))
+            # noinspection PyTypeChecker
+            command = command.replace("@user", DatabaseInfo.get("user"))
             # noinspection PyTypeChecker
             command = command.replace("@pw", DatabaseInfo.get("password"))
             command = command.replace("@dump", sql.getPath())
+
 
             print("Executing: " + command)
 
