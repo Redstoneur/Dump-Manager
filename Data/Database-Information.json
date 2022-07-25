@@ -7,14 +7,3 @@
   "doker_container": "",
   "script-dumps": null
 }
-
-{
-  "host": "localhost",
-  "port": "3306",
-  "user": "administrateur",
-  "password": "Lp1Bb4Tw3Glg!",
-  "name": null,
-  "path-dumps": null,
-  "doker_container": "",
-  "script-dumps": "docker exec -i mysql mysql -u @user -p@pw < @dump"
-}
