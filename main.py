@@ -1,7 +1,7 @@
 from Runner import *
 
 
-def main(run: str, graphique: bool) -> Error:
+def main(run: str, graphique: bool = True) -> Error:
     """
     main function of the program
     :param run: str, information or dump
@@ -19,7 +19,7 @@ if __name__ == '__main__':
         run = "shell"
 
     # run the program
-    result: Error = main(run=run, graphique=True)
+    result: Error = main(run=run)
 
     # if in debug mode, wait for the user to press a key
     if not result.success and result.code != 200:
