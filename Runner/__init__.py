@@ -1,3 +1,5 @@
+import tkinter
+
 from Runner.DevFileManager import *
 from Runner.ShellRunner import *
 from Runner.UtileFonction import *
@@ -19,8 +21,10 @@ def fenetre(run: str = "nothing") -> Error:
     loadingLabel: tk.Label
     errorLabel: tk.Label
     LabelAddDump: tk.Label
+    LabelDockerContainer: tk.Label
 
     textfieldPath: tk.Text
+    textfieldDockerContainer: tk.Text
 
     RunButton: tk.Button
     ReloadButton: tk.Button
@@ -36,6 +40,9 @@ def fenetre(run: str = "nothing") -> Error:
 
     grid_rowconfigure_Max: int = 8
     grid_columnconfigure_Max: int = 3
+
+    if isDockerCommand(shellStartCommand):
+        grid_rowconfigure_Max += 1
 
     try:
         window.title(ApplicationInformation.get_name() + " " + ApplicationInformation.get_version())
@@ -62,6 +69,22 @@ def fenetre(run: str = "nothing") -> Error:
         labelTitreSubligne = tk.Label(window, text=ApplicationInformation.get_version())
         labelTitreSubligne.config(font=("Courier", 10))
         labelTitreSubligne.grid(row=row, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
+
+        if isDockerCommand(shellStartCommand):
+            # position
+            row += 1
+
+            # label docker container
+            LabelDockerContainer = tk.Label(window, text="Docker container:")
+            LabelDockerContainer.grid(row=row, column=0, sticky="nsew")
+
+            # textfield docker container
+            textfieldDockerContainer = tk.Text(window, height=1, width=20)
+            textfieldDockerContainer.insert(tk.END, get_default_docker_container())
+            textfieldDockerContainer.grid(row=row, column=1, sticky="nsew")
+        else:
+            # noinspection PyTypeChecker
+            textfieldDockerContainer = None
 
         # position
         row += 1
@@ -94,6 +117,7 @@ def fenetre(run: str = "nothing") -> Error:
         # create a button to run the program
         RunButton = tk.Button(window, text="Run",
                               command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
+                                                  textfieldDockerContainer=textfieldDockerContainer,
                                                   loadDumps=ComboboxDumps.get(ComboboxDumps.curselection()), run=run))
         RunButton.grid(row=row, column=0, sticky="nsew")
 
@@ -102,7 +126,8 @@ def fenetre(run: str = "nothing") -> Error:
         ReloadButton.grid(row=row, column=1, sticky="nsew")
 
         # create a button to clean the terminal
-        cleanTerminalButton = tk.Button(window, text="Clean Terminal", command=lambda: CleanTerminal(errorLabel=errorLabel))
+        cleanTerminalButton = tk.Button(window, text="Clean Terminal",
+                                        command=lambda: CleanTerminal(errorLabel=errorLabel))
         cleanTerminalButton.grid(row=row, column=2, sticky="nsew")
 
         # position
@@ -145,7 +170,8 @@ def fenetre(run: str = "nothing") -> Error:
         return Error(success=True, message="Mode graphique was successfully run", code=200)
 
 
-def Run(errorLabel: tk.Label, loadingLabel: tk.Label, loadDumps: str = 'all dumps', run: str = "nothing") -> None:
+def Run(errorLabel: tk.Label, loadingLabel: tk.Label, textfieldDockerContainer: tk.Text = None,
+        loadDumps: str = 'all dumps', run: str = "nothing") -> None:
     """
     display the error in the label
     :param errorLabel: tk.Label, label to display the error
@@ -158,7 +184,8 @@ def Run(errorLabel: tk.Label, loadingLabel: tk.Label, loadDumps: str = 'all dump
     if loadDumps != 'all dumps':
         loadDumps = loadDumps.split(' ')[0]
     start: WeekDay = getActualWeekDay()
-    error: Error = Runner(loadingLabel=loadingLabel, loadDumps=loadDumps, run=run)
+    error: Error = Runner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
+                          loadDumps=loadDumps, run=run)
     calendar: ErrorCalendar = CreateCalendar(start=start, error=error, graphique=True)
     loadingLabel.config(text=" ")
     loadingLabel.update()
@@ -166,11 +193,13 @@ def Run(errorLabel: tk.Label, loadingLabel: tk.Label, loadDumps: str = 'all dump
     errorLabel.update()
 
 
-def Runner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps', run: str = "nothing",
+def Runner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = None, loadDumps: str = 'all dumps',
+           run: str = "nothing",
            graphique: bool = False) -> Error:
     """
     Run the program
     :param loadingLabel: tk.Label, label to display the error
+    :param textfieldDockerContainer: tk.Text, textfield to display the docker container
     :param loadDumps: str, information or dump
     :param run: str, information or dump
     :param graphique: bool, if the program is run in graphique mode
@@ -189,7 +218,8 @@ def Runner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps', run: str
                 print("\nDebug mode N1")
                 error = Error(success=True, message="Debug mode N1", code=2109)
             elif run == "shell":  # if run shell
-                error = ShellRunner(loadingLabel=loadingLabel, loadDumps=loadDumps)
+                error = ShellRunner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
+                                    loadDumps=loadDumps)
             else:  # if run nothing
                 error = Error(success=False, message="run not found", code=3)
         else:  # if not read information
