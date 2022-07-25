@@ -23,6 +23,20 @@ elif "@user" not in shellStartCommand or "@pw" not in shellStartCommand or "@dum
     print(Error(success=False, message="Error: not have @user, @pw, @dump in shellStartCommand", code=2).__str__())
     sys.exit(2)
 
+ignoredFiles: list[str] = [".Dumps.md", "lastDumpsFiles"]
+
+
+def ignoredFile(txt: str):
+    """
+    check if the file is ignored
+    :param txt: str, name of the file
+    :return: bool, True if the file is ignored, False if not
+    """
+    for i in ignoredFiles:
+        if i == txt:
+            return True
+    return False
+
 
 def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> Error:
     """
@@ -49,8 +63,8 @@ def ShellRunner(loadingLabel: tk.Label = None, loadDumps: str = 'all dumps') -> 
     # get all dumps in the folder and add them to the server with a shell command to load the dump in the database
     for folder in FoldersContained.folders:
 
-        # don't read Dumps.md
-        if folder == "Dumps.md":
+        # don't read .Dumps.md
+        if ignoredFile(folder):
             continue
         else:
             numbersOfFiles += 1
@@ -146,14 +160,15 @@ def ListOfDumps() -> list[str]:
     """
     FoldersContained.update()
     listOfDumps: list[str] = ['all dumps']
+
     for folder in FoldersContained.folders:
-        if folder == "Dumps.md":
+        if ignoredFile(folder):
             continue
         else:
             f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
             if f is not None and f.getExtension() == "sql":  # if the file is a sql file
                 sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
-                listOfDumps += [sql.getNameDataBase()+" ("+sql.getDateOfDump()+")"]
+                listOfDumps += [sql.getNameDataBase() + " (" + sql.getDateOfDump() + ")"]
     return listOfDumps
 
 
@@ -164,8 +179,9 @@ def NumberOfDumps() -> int:
     """
     numbersOfDumps: int = 0
     FoldersContained.update()
+
     for folder in FoldersContained.folders:
-        if folder == "Dumps.md":
+        if ignoredFile(folder):
             continue
         else:
             f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
