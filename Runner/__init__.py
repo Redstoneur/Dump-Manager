@@ -1,5 +1,3 @@
-import tkinter
-
 from Runner.DevFileManager import *
 from Runner.ShellRunner import *
 from Runner.UtileFonction import *
@@ -14,8 +12,10 @@ def fenetre(run: str = "nothing") -> Error:
     :param run: str, information or dump
     :return: None
     """
+    # create the window
     window: tk.Tk = tk.Tk()
 
+    # create the label
     labelTitre: tk.Label
     labelTitreSubligne: tk.Label
     loadingLabel: tk.Label
@@ -23,31 +23,56 @@ def fenetre(run: str = "nothing") -> Error:
     LabelAddDump: tk.Label
     LabelDockerContainer: tk.Label
 
-    textfieldPath: tk.Text
+    # create the textfield
+    textfieldPathAddDump: tk.Text
     textfieldDockerContainer: tk.Text
 
+    # create the button
     RunButton: tk.Button
     ReloadButton: tk.Button
     cleanTerminalButton: tk.Button
-    useTextfieldButton: tk.Button
+    useTextfieldPathAddDumpButton: tk.Button
 
+    # create the listbox
     ComboboxDumps: tk.Listbox
 
+    # create the checkbutton
+    checkboxDockercontainer: tk.Checkbutton
+
+    # create the boolean variable
+    varCheckboxDockercontainer: tk.BooleanVar
+
+    # create the menu
+    menuButton: tk.Menu
+    menuUtile: tk.Menu
+    listSubMenuUtile: list[tk.Menu]
+    menuInfoDb: tk.Menu
+    listSubMenuInfoDb: list[tk.Menu]
+    menuAbout: tk.Menu
+    listSubMenuAbout: list[tk.Menu]
+
+    # create the error object
     error: Error
 
+    # define the size of the window
     longueur: int = 500
     hauteur: int = 500
 
-    grid_rowconfigure_Max: int = 8
+    # define the size of the grid
+    grid_rowconfigure_Max: int = 9
     grid_columnconfigure_Max: int = 3
 
+    # add one row to the grid if the command is a docker command
     if isDockerCommand(shellStartCommand):
         grid_rowconfigure_Max += 1
 
     try:
+        # define the title of the window
         window.title(ApplicationInformation.get_name() + " " + ApplicationInformation.get_version())
+        # define the size of the window
         window.geometry(str(longueur) + "x" + str(hauteur))
 
+        # create the grid for the window
         for i in range(grid_rowconfigure_Max):
             window.grid_rowconfigure(i, weight=1)
 
@@ -82,9 +107,84 @@ def fenetre(run: str = "nothing") -> Error:
             textfieldDockerContainer = tk.Text(window, height=1, width=20)
             textfieldDockerContainer.insert(tk.END, get_default_docker_container())
             textfieldDockerContainer.grid(row=row, column=1, sticky="we")
+
+            # checkbox docker container
+            varCheckboxDockercontainer = tk.BooleanVar()
+            checkboxDockercontainer = tk.Checkbutton(window, text="Use docker container",
+                                                     variable=varCheckboxDockercontainer, onvalue=True, offvalue=False,
+                                                     command=lambda: textfieldDockerContainerLocker(
+                                                         textfieldDockerContainer=textfieldDockerContainer,
+                                                         varCheckboxDockercontainer=varCheckboxDockercontainer))
+            checkboxDockercontainer.select()
+            textfieldDockerContainerLocker(textfieldDockerContainer=textfieldDockerContainer,
+                                           varCheckboxDockercontainer=varCheckboxDockercontainer)
+            checkboxDockercontainer.grid(row=row, column=2, sticky="we")
+
         else:
             # noinspection PyTypeChecker
             textfieldDockerContainer = None
+
+        # position
+        row += 1
+
+        menuButton = tk.Menu(window)
+
+        # menu utile
+        menuUtile = tk.Menu(menuButton)
+        menuUtile.add_command(label="Run", command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
+                                                               textfieldDockerContainer=textfieldDockerContainer,
+                                                               loadDumps=ComboboxDumps.get(
+                                                                   ComboboxDumps.curselection()), run=run))
+        # menuUtile.add_command(label="Use textfield path add dump", command=lambda: useTextfieldPathAddDump())
+        menuUtile.add_command(label="Default docker container",
+                              command=lambda: textfieldDockerContainerToDefaultWithCheckbox(
+                                  textfieldDockerContainer=textfieldDockerContainer,
+                                  varCheckboxDockercontainer=varCheckboxDockercontainer))
+        menuUtile.add_command(label="Reload", command=lambda: Reload(listeDumps=ComboboxDumps))
+        menuUtile.add_command(label="Clean terminal", command=lambda: CleanDataInformation(errorLabel=errorLabel))
+        menuUtile.add_command(label="Exit", command=lambda: exit())
+
+        menuButton.add_cascade(label="Utile", menu=menuUtile)
+
+        # add the menu Cascade menuInfoDb
+        menuInfoDb = tk.Menu(menuButton, tearoff=0)
+
+        listSubMenuInfoDb: list[tk.Menu] = [tk.Menu(menuInfoDb, tearoff=0) for i in range(3)]
+
+        listSubMenuInfoDb[0].add_command(label="Host : " + AboutDB("host"))
+        listSubMenuInfoDb[0].add_command(label="Port : " + AboutDB("port"))
+        listSubMenuInfoDb[0].add_command(label="user : " + AboutDB("user"))
+        menuInfoDb.add_cascade(label="Database", menu=listSubMenuInfoDb[0])
+
+        listSubMenuInfoDb[1].add_command(label="Path of dump : " + AboutDB("path-dumps"))
+        menuInfoDb.add_cascade(label="Dump", menu=listSubMenuInfoDb[1])
+
+        listSubMenuInfoDb[2].add_command(label="Script for execute dumps : " + AboutDB("script-dumps"))
+        if isDockerCommand(shellStartCommand):
+            listSubMenuInfoDb[2].add_command(label="Docker container by default : " + AboutDB("doker_container"))
+        menuInfoDb.add_cascade(label="Script", menu=listSubMenuInfoDb[2])
+
+        menuButton.add_cascade(label="Info DB", menu=menuInfoDb)
+
+        # add the menu Cascade menuAbout
+        menuAbout = tk.Menu(menuButton, tearoff=0)
+
+        listSubMenuAbout: list[tk.Menu] = [tk.Menu(menuAbout, tearoff=0) for i in range(2)]
+
+        listSubMenuAbout[0].add_command(label="Name : " + ApplicationInformation.name)
+        listSubMenuAbout[0].add_command(label="Version : " + ApplicationInformation.version)
+        listSubMenuAbout[0].add_command(label="License : " + str(ApplicationInformation.get("license")))
+        menuAbout.add_cascade(label="About", menu=listSubMenuAbout[0])
+
+        listSubMenuAbout[1].add_command(label="Author : " + ApplicationInformation.author_first_name +
+                                              " " + ApplicationInformation.author_last_name)
+        listSubMenuAbout[1].add_command(label="Email : " + ApplicationInformation.email)
+        listSubMenuAbout[1].add_command(label="Website : " + str(ApplicationInformation.get("website")))
+        menuAbout.add_cascade(label="Contact", menu=listSubMenuAbout[1])
+
+        menuButton.add_cascade(label="About", menu=menuAbout)
+
+        window.config(menu=menuButton)
 
         # position
         row += 1
@@ -94,14 +194,15 @@ def fenetre(run: str = "nothing") -> Error:
         LabelAddDump.grid(row=row, column=0, sticky="we")
 
         # path textfield
-        textfieldPath = tk.Text(window, height=1, width=30)
-        textfieldPath.insert(tk.END, "C:/Users/alipio.simoes/Downloads/")
-        textfieldPath.grid(row=row, column=1, sticky="we")
+        textfieldPathAddDump = tk.Text(window, height=1, width=30)
+        textfieldPathAddDump.insert(tk.END, "C:/Users/alipio.simoes/Downloads/")
+        textfieldPathAddDump.grid(row=row, column=1, sticky="we")
 
         # use textfield button
-        useTextfieldButton = tk.Button(window, text="Use",
-                                       command=lambda: AddDump(textfieldPath=textfieldPath, listeDumps=ComboboxDumps))
-        useTextfieldButton.grid(row=row, column=2, sticky="we")
+        useTextfieldPathAddDumpButton = tk.Button(window, text="Use",
+                                                  command=lambda: AddDump(textfieldPath=textfieldPathAddDump,
+                                                                          listeDumps=ComboboxDumps))
+        useTextfieldPathAddDumpButton.grid(row=row, column=2, sticky="we")
 
         # position
         row += 1
