@@ -1,5 +1,4 @@
-from Utile import *
-from Database import *
+from Utilities import *
 
 ######################################################################################################################
 ############################## DataBase Runner #######################################################################
@@ -21,7 +20,7 @@ def DbRunner() -> Error:
     """
     try:
         print('connecting to database')
-        bd: databaseExecutor = databaseExecutor(user=DatabaseInfo.get("user"),
+        bd: DatabaseExecutor = DatabaseExecutor(user=DatabaseInfo.get("user"),
                                                 password=DatabaseInfo.get("password"),
                                                 host=DatabaseInfo.get("host"),
                                                 port=DatabaseInfo.get("port"),

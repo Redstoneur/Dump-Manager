@@ -127,7 +127,7 @@ def fenetre(run: str = "nothing") -> Error:
 
         # create a button to clean the terminal
         cleanTerminalButton = tk.Button(window, text="Clean Terminal",
-                                        command=lambda: CleanTerminal(errorLabel=errorLabel))
+                                        command=lambda: CleanDataInformation(errorLabel=errorLabel))
         cleanTerminalButton.grid(row=row, column=2, sticky="nsew")
 
         # position

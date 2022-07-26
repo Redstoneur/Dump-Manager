@@ -16,7 +16,11 @@ It simplifies to add a new dump in the database and to manage it.
 
 ## Dump-Manager-Installation
 
-> not implemented
+for using Dump-Manager, you need to install the following dependencies:
+- [Python-Utilities](https://github.com/Redstoneur/Python-Utilities)
+- [tkinter](https://docs.python.org/3/library/tkinter.html)
+- [sys](https://docs.python.org/3/library/sys.html)
+- [os](https://docs.python.org/3/library/os.html)
 
 ## Dump-Manager-Configuration
 
@@ -28,12 +32,11 @@ To configure Dump-Manager, you need to implement the JSON-file `./Data/Database-
   "port": "port of the database",
   "user": "user of the database",
   "password": "password of the database",
-  "name": "name of the database",
-  // optional if you use a specific database and you use the DatabaseRunner
   "path-dumps": "path of the dumps",
   // optional if you use a specific folder for the dumps
+   "doker_container": "name of the docker container",
+   // optional if you use a command of the docker container
   "script-dumps": "command to execute to create a dump"
-  // optional if you use a specific command for the dumps and you use the ShellRunner
 }
 ```
 
@@ -58,5 +61,5 @@ To use Dump-Manager, you need to put dumps in the folder `./Data/Dumps`
 
 3. What is the current version of the project
 
-    - the current version is 1.2.7
+    - the current version is 1.3.0
 

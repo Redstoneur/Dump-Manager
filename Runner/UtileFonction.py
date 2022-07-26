@@ -1,6 +1,5 @@
 import tkinter as tk
-import platform as plt
-from Utile import *
+from Utilities import *
 from Runner.DevFileManager.ApplicationInformation import *
 from Runner.ShellRunner import DumpsPath, ListOfDumps, isDumpSqlFile
 
@@ -8,7 +7,7 @@ ApplicationInformation: ApplicationInformation = ApplicationInformation("./Data/
 my_os: str = plt.system()
 
 
-def CleanTerminal(errorLabel: tk.Label = None) -> None:
+def CleanDataInformation(errorLabel: tk.Label = None) -> None:
     """
     clean the terminal
     :return: None
@@ -17,11 +16,7 @@ def CleanTerminal(errorLabel: tk.Label = None) -> None:
     if errorLabel is not None:
         errorLabel.config(text=" ")
 
-    # if the os is windows
-    if my_os == "Windows":
-        os.system("cls")
-    else:  # if the os is linux
-        os.system("clear")
+    CleanTerminal()
 
 
 def AddDump(textfieldPath: tk.Text, listeDumps: tk.Listbox) -> None:

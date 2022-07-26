@@ -1,4 +1,4 @@
-from Utile import *
+from Utilities import Error, TxtFile, generateFile, createTxtFile, file
 
 
 ######################################################################################################################
