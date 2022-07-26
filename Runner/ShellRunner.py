@@ -231,3 +231,36 @@ def NumberOfDumps() -> int:
             if f is not None and f.getExtension() == "sql":  # if the file is a sql file
                 numbersOfDumps += 1
     return numbersOfDumps
+
+
+def CleanDumpsFolder() -> Error:
+    """
+    clean the folder of all dumps
+    :return: Error, error message
+    """
+    FoldersContained.update()
+    success: bool = True
+    message: str = "the folder is clean"
+    code: int = 200
+
+    pathLastDumpsFiles = DumpsPath + "/lastDumpsFiles"
+    createFolder(pathLastDumpsFiles)
+
+    for folder in FoldersContained.folders:
+        if ignoredFile(folder):
+            continue
+        else:
+            f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
+            if f is not None and f.getExtension() == "sql":  # if the file is a sql file
+                sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
+                moveFile(sql.getPath(), pathLastDumpsFiles)
+            else:
+                print("File not found: " + folder)
+                if success:
+                    success = False
+                    message = "Error: file not found\n" + \
+                            "    - " + folder + "\n"
+                    code = 404
+                else:
+                    message += "    - " + folder
+    return Error(success=success, message=message, code=code)

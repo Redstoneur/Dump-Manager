@@ -59,7 +59,7 @@ def fenetre(run: str = "nothing") -> Error:
     hauteur: int = 500
 
     # define the size of the grid
-    grid_rowconfigure_Max: int = 9
+    grid_rowconfigure_Max: int = 8
     grid_columnconfigure_Max: int = 3
 
     # add one row to the grid if the command is a docker command
@@ -71,6 +71,68 @@ def fenetre(run: str = "nothing") -> Error:
         window.title(ApplicationInformation.get_name() + " " + ApplicationInformation.get_version())
         # define the size of the window
         window.geometry(str(longueur) + "x" + str(hauteur))
+
+        # create the menu bar
+        menuButton = tk.Menu(window)
+
+        # menu utile
+        menuUtile = tk.Menu(menuButton)
+        menuUtile.add_command(label="Run", command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
+                                                               textfieldDockerContainer=textfieldDockerContainer,
+                                                               loadDumps=ComboboxDumps.get(
+                                                                   ComboboxDumps.curselection()), run=run))
+        # menuUtile.add_command(label="Use textfield path add dump", command=lambda: useTextfieldPathAddDump())
+        menuUtile.add_command(label="Default docker container",
+                              command=lambda: textfieldDockerContainerToDefaultWithCheckbox(
+                                  textfieldDockerContainer=textfieldDockerContainer,
+                                  varCheckboxDockercontainer=varCheckboxDockercontainer))
+        menuUtile.add_command(label="Reload", command=lambda: Reload(listeDumps=ComboboxDumps))
+        menuUtile.add_command(label="Clean terminal", command=lambda: CleanDataInformation(errorLabel=errorLabel))
+        menuUtile.add_command(label="Clean Dumps folder", command=lambda: print(CleanDumpsFolder().__str__() + "\n"))
+        menuUtile.add_command(label="Quit", command=lambda: window.destroy())
+        menuUtile.add_command(label="Exit", command=lambda: exit())
+
+        menuButton.add_cascade(label="Utile", menu=menuUtile)
+
+        # add the menu Cascade menuInfoDb
+        menuInfoDb = tk.Menu(menuButton, tearoff=0)
+
+        listSubMenuInfoDb: list[tk.Menu] = [tk.Menu(menuInfoDb, tearoff=0) for i in range(3)]
+
+        listSubMenuInfoDb[0].add_command(label="Host : " + AboutDB("host"))
+        listSubMenuInfoDb[0].add_command(label="Port : " + AboutDB("port"))
+        listSubMenuInfoDb[0].add_command(label="user : " + AboutDB("user"))
+        menuInfoDb.add_cascade(label="Database", menu=listSubMenuInfoDb[0])
+
+        listSubMenuInfoDb[1].add_command(label="Path of dump : " + AboutDB("path-dumps"))
+        menuInfoDb.add_cascade(label="Dump", menu=listSubMenuInfoDb[1])
+
+        listSubMenuInfoDb[2].add_command(label="Script for execute dumps : " + AboutDB("script-dumps"))
+        if isDockerCommand(shellStartCommand):
+            listSubMenuInfoDb[2].add_command(label="Docker container by default : " + AboutDB("doker_container"))
+        menuInfoDb.add_cascade(label="Script", menu=listSubMenuInfoDb[2])
+
+        menuButton.add_cascade(label="Info DB", menu=menuInfoDb)
+
+        # add the menu Cascade menuAbout
+        menuAbout = tk.Menu(menuButton, tearoff=0)
+
+        listSubMenuAbout: list[tk.Menu] = [tk.Menu(menuAbout, tearoff=0) for i in range(2)]
+
+        listSubMenuAbout[0].add_command(label="Name : " + ApplicationInformation.name)
+        listSubMenuAbout[0].add_command(label="Version : " + ApplicationInformation.version)
+        listSubMenuAbout[0].add_command(label="License : " + str(ApplicationInformation.get("license")))
+        menuAbout.add_cascade(label="About", menu=listSubMenuAbout[0])
+
+        listSubMenuAbout[1].add_command(label="Author : " + ApplicationInformation.author_first_name +
+                                              " " + ApplicationInformation.author_last_name)
+        listSubMenuAbout[1].add_command(label="Email : " + ApplicationInformation.email)
+        listSubMenuAbout[1].add_command(label="Website : " + str(ApplicationInformation.get("website")))
+        menuAbout.add_cascade(label="Contact", menu=listSubMenuAbout[1])
+
+        menuButton.add_cascade(label="About", menu=menuAbout)
+
+        window.config(menu=menuButton)
 
         # create the grid for the window
         for i in range(grid_rowconfigure_Max):
@@ -123,68 +185,6 @@ def fenetre(run: str = "nothing") -> Error:
         else:
             # noinspection PyTypeChecker
             textfieldDockerContainer = None
-
-        # position
-        row += 1
-
-        menuButton = tk.Menu(window)
-
-        # menu utile
-        menuUtile = tk.Menu(menuButton)
-        menuUtile.add_command(label="Run", command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
-                                                               textfieldDockerContainer=textfieldDockerContainer,
-                                                               loadDumps=ComboboxDumps.get(
-                                                                   ComboboxDumps.curselection()), run=run))
-        # menuUtile.add_command(label="Use textfield path add dump", command=lambda: useTextfieldPathAddDump())
-        menuUtile.add_command(label="Default docker container",
-                              command=lambda: textfieldDockerContainerToDefaultWithCheckbox(
-                                  textfieldDockerContainer=textfieldDockerContainer,
-                                  varCheckboxDockercontainer=varCheckboxDockercontainer))
-        menuUtile.add_command(label="Reload", command=lambda: Reload(listeDumps=ComboboxDumps))
-        menuUtile.add_command(label="Clean terminal", command=lambda: CleanDataInformation(errorLabel=errorLabel))
-        menuUtile.add_command(label="Exit", command=lambda: exit())
-
-        menuButton.add_cascade(label="Utile", menu=menuUtile)
-
-        # add the menu Cascade menuInfoDb
-        menuInfoDb = tk.Menu(menuButton, tearoff=0)
-
-        listSubMenuInfoDb: list[tk.Menu] = [tk.Menu(menuInfoDb, tearoff=0) for i in range(3)]
-
-        listSubMenuInfoDb[0].add_command(label="Host : " + AboutDB("host"))
-        listSubMenuInfoDb[0].add_command(label="Port : " + AboutDB("port"))
-        listSubMenuInfoDb[0].add_command(label="user : " + AboutDB("user"))
-        menuInfoDb.add_cascade(label="Database", menu=listSubMenuInfoDb[0])
-
-        listSubMenuInfoDb[1].add_command(label="Path of dump : " + AboutDB("path-dumps"))
-        menuInfoDb.add_cascade(label="Dump", menu=listSubMenuInfoDb[1])
-
-        listSubMenuInfoDb[2].add_command(label="Script for execute dumps : " + AboutDB("script-dumps"))
-        if isDockerCommand(shellStartCommand):
-            listSubMenuInfoDb[2].add_command(label="Docker container by default : " + AboutDB("doker_container"))
-        menuInfoDb.add_cascade(label="Script", menu=listSubMenuInfoDb[2])
-
-        menuButton.add_cascade(label="Info DB", menu=menuInfoDb)
-
-        # add the menu Cascade menuAbout
-        menuAbout = tk.Menu(menuButton, tearoff=0)
-
-        listSubMenuAbout: list[tk.Menu] = [tk.Menu(menuAbout, tearoff=0) for i in range(2)]
-
-        listSubMenuAbout[0].add_command(label="Name : " + ApplicationInformation.name)
-        listSubMenuAbout[0].add_command(label="Version : " + ApplicationInformation.version)
-        listSubMenuAbout[0].add_command(label="License : " + str(ApplicationInformation.get("license")))
-        menuAbout.add_cascade(label="About", menu=listSubMenuAbout[0])
-
-        listSubMenuAbout[1].add_command(label="Author : " + ApplicationInformation.author_first_name +
-                                              " " + ApplicationInformation.author_last_name)
-        listSubMenuAbout[1].add_command(label="Email : " + ApplicationInformation.email)
-        listSubMenuAbout[1].add_command(label="Website : " + str(ApplicationInformation.get("website")))
-        menuAbout.add_cascade(label="Contact", menu=listSubMenuAbout[1])
-
-        menuButton.add_cascade(label="About", menu=menuAbout)
-
-        window.config(menu=menuButton)
 
         # position
         row += 1
