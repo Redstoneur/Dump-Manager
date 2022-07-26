@@ -5,5 +5,6 @@
   "password": "",
   "path-dumps": null,
   "doker_container": null,
-  "script-dumps": null
+  "script-dumps": null,
+  "script-dumps-generator": null
 }
