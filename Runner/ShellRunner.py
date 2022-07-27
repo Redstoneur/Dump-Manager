@@ -2,8 +2,6 @@ import tkinter as tk
 from Runner.varShellRunner import *
 
 
-
-
 ######################################################################################################################
 ############################## Shell Runner ##########################################################################
 ######################################################################################################################
@@ -280,7 +278,6 @@ def GenerateDumps(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Te
     :param textfieldDockerContainer: tk.Text, textfield to show the docker container
     :return: Error, error message
     """
-    import time
     success: bool = True
     message: str = "the dump is generated"
     code: int = 200
@@ -301,7 +298,8 @@ def GenerateDumps(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Te
     for db in listDatabasesWithoutSytemBase():
         numFolders += 1
         print("Generate dump: " + db)
-        loadingLabel.config(text="Generate dump: " + db + " (" + str(numFolders) + "/" + str(len(listDatabasesWithoutSytemBase())) + ")")
+        loadingLabel.config(text="Generate dump: " + db + " (" + str(numFolders) + "/" + str(
+            len(listDatabasesWithoutSytemBase())) + ")")
         loadingLabel.update()
 
         # shell command to dump the database
@@ -318,7 +316,7 @@ def GenerateDumps(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Te
 
         try:
             print("Executing: " + command)
-            #os.system(command)
+            # os.system(command)
         except Exception as e:
             if success:
                 success = False
