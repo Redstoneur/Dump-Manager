@@ -104,3 +104,5 @@ if not errorGenerateDumpCommand.success:
     sys.exit(errorGenerateDumpCommand.code)
 
 ignoredFiles: list[str] = [".Dumps.md", "lastDumpsFiles"]
+
+ignoredDatabases: list[str] = ["information_schema", "mysql", "performance_schema", "sys"]

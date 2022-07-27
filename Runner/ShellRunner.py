@@ -57,6 +57,16 @@ def listDatabases() -> list:
         return []
     return listDb
 
+def ignoredDatabase(db: str) -> bool:
+    """
+    check if the database is ignored
+    :param db: str, name of the database
+    :return: bool, True if the database is ignored, False if not
+    """
+    for i in ignoredDatabases:
+        if i == db:
+            return True
+    return False
 
 def listDatabasesWithoutSytemBase() -> list:
     """
@@ -65,7 +75,7 @@ def listDatabasesWithoutSytemBase() -> list:
     """
     listDb: list[str] = []
     for db in listDatabases():
-        if db == "information_schema" or db == "mysql" or db == "performance_schema" or db == "sys":
+        if ignoredDatabase(db):
             continue
         else:
             listDb += [db]
@@ -315,8 +325,7 @@ def GenerateDumps(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Te
         print("Executing: " + command)
 
         try:
-            print("Executing: " + command)
-            # os.system(command)
+            os.system(command)
         except Exception as e:
             if success:
                 success = False
