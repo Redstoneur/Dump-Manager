@@ -46,6 +46,8 @@ def fenetre(run: str = "nothing") -> Error:
     menuButton: tk.Menu
     menuUtile: tk.Menu
     listSubMenuUtile: list[tk.Menu]
+    menuUtileCleanDumpsFolder: tk.Menu
+    listSubMenuUtileCleanDumpsFolder: list[tk.Menu]
     menuInfoDb: tk.Menu
     listSubMenuInfoDb: list[tk.Menu]
     menuAbout: tk.Menu
@@ -63,7 +65,7 @@ def fenetre(run: str = "nothing") -> Error:
     grid_columnconfigure_Max: int = 3
 
     # add one row to the grid if the command is a docker command
-    if isDockerCommand(shellStartCommand):
+    if isDockerCommand(AddDumpsCommand):
         grid_rowconfigure_Max += 1
 
     try:
@@ -88,7 +90,13 @@ def fenetre(run: str = "nothing") -> Error:
                                   varCheckboxDockercontainer=varCheckboxDockercontainer))
         menuUtile.add_command(label="Reload", command=lambda: Reload(listeDumps=ComboboxDumps))
         menuUtile.add_command(label="Clean terminal", command=lambda: CleanDataInformation(errorLabel=errorLabel))
-        menuUtile.add_command(label="Clean Dumps folder", command=lambda: print(CleanDumpsFolder().__str__() + "\n"))
+        menuUtile.add_command(label="Clean Dumps folder",
+                              command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
+                                                  isGet=False, isClean=True, isGenerate=False))
+        menuUtile.add_command(label="Generate Dumps",
+                              command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
+                                                  textfieldDockerContainer=textfieldDockerContainer,
+                                                  isGet=False, isClean=False, isGenerate=True))
         menuUtile.add_command(label="Quit", command=lambda: window.destroy())
         menuUtile.add_command(label="Exit", command=lambda: exit())
 
@@ -108,7 +116,7 @@ def fenetre(run: str = "nothing") -> Error:
         menuInfoDb.add_cascade(label="Dump", menu=listSubMenuInfoDb[1])
 
         listSubMenuInfoDb[2].add_command(label="Script for execute dumps : " + AboutDB("script-dumps"))
-        if isDockerCommand(shellStartCommand):
+        if isDockerCommand(AddDumpsCommand):
             listSubMenuInfoDb[2].add_command(label="Docker container by default : " + AboutDB("doker_container"))
         menuInfoDb.add_cascade(label="Script", menu=listSubMenuInfoDb[2])
 
@@ -157,7 +165,7 @@ def fenetre(run: str = "nothing") -> Error:
         labelTitreSubligne.config(font=("Courier", 10))
         labelTitreSubligne.grid(row=row, column=0, columnspan=grid_columnconfigure_Max, sticky="nsew")
 
-        if isDockerCommand(shellStartCommand):
+        if isDockerCommand(AddDumpsCommand):
             # position
             row += 1
 
@@ -272,26 +280,71 @@ def fenetre(run: str = "nothing") -> Error:
 
 
 def Run(errorLabel: tk.Label, loadingLabel: tk.Label, textfieldDockerContainer: tk.Text = None,
-        loadDumps: str = 'all dumps', run: str = "nothing") -> None:
+        loadDumps: str = 'all dumps', run: str = "nothing",
+        isGet: bool = True, isClean: bool = False, isGenerate: bool = False) -> None:
     """
     display the error in the label
-    :param errorLabel: tk.Label, label to display the error
-    :param loadingLabel: tk.Label, label to display the loading
-    :param loadDumps: str, dump to load
-    :param run: str, information or dump
-    :param errorLabel: tk.Label, label to display the error
+    :param errorLabel: label to display the error
+    :param loadingLabel: label to display the loading
+    :param textfieldDockerContainer: textfield to display the docker container
+    :param loadDumps: the dumps to load
+    :param run: the command to run
+    :param isGet: if the command is get
+    :param isClean: if the command is clean
+    :param isGenerate: if the command is generate
     :return: None
     """
     if loadDumps != 'all dumps':
         loadDumps = loadDumps.split(' ')[0]
     start: WeekDay = getActualWeekDay()
-    error: Error = Runner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
-                          loadDumps=loadDumps, run=run)
-    calendar: ErrorCalendar = CreateCalendar(start=start, error=error, graphique=True)
+
+    if isGet:
+        isClean = False
+        isGenerate = False
+    elif isClean:
+        isGet = False
+        isGenerate = False
+    elif isGenerate:
+        isGet = False
+        isClean = False
+    else:
+        isGet = False
+        isClean = False
+        isGenerate = False
+
+    titre: str = ""
+    description: str = ""
+
+    if isGet:
+        error: Error = Runner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
+                              loadDumps=loadDumps, run=run)
+        titre = "Get"
+        description = "Get the dumps"
+    elif isClean:
+        error: Error = CleanDumpsFolder(loadingLabel=loadingLabel)
+        titre = "Clean"
+        description = "Clean the dumps folder"
+    elif isGenerate:
+        error: Error = GenerateDumps(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer)
+        titre = "Generate"
+        description = "Generate the dumps"
+    else:
+        error: Error = Error(success=False, message="Nothing to run", code=5)
+        titre = "Nothing"
+        description = "Nothing to run"
+
+    calendar: ErrorCalendar = CreateCalendar(titre=titre, description=description,
+                                             start=start, error=error, graphique=True)
     loadingLabel.config(text=" ")
     loadingLabel.update()
     errorLabel.config(text=calendar.__str__())
     errorLabel.update()
+
+    # create a file with a Calendar of the last dump
+    CalendarFileManager(titre=titre, description=description,
+                        start=start, error=error, graphique=False)
+    # create a file log with the error
+    LogFileManager(error=error)
 
 
 def Runner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = None, loadDumps: str = 'all dumps',
@@ -325,10 +378,5 @@ def Runner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = No
                 error = Error(success=False, message="run not found", code=3)
         else:  # if not read information
             error = Error(success=False, message="Error: information", code=4)
-
-        # create a file with a Calendar of the last dump
-        CalendarFileManager(start=start, error=error, graphique=graphique)
-        # create a file log with the error
-        LogFileManager(error=error)
 
     return error

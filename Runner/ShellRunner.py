@@ -1,44 +1,12 @@
-import sys
 import tkinter as tk
-from Utilities import *
+from Runner.varShellRunner import *
+
+
+
 
 ######################################################################################################################
 ############################## Shell Runner ##########################################################################
 ######################################################################################################################
-
-DatabaseInfo: JsonFile = JsonFile("./Data/Database-Information.json")
-
-# noinspection PyTypeChecker
-DumpsPath: str = DatabaseInfo.get("path-dumps")
-if DumpsPath is None or DumpsPath == "":
-    DumpsPath = "./Data/Dumps"
-FoldersContained: FoldersContained = FoldersContained(DumpsPath)
-
-# noinspection PyTypeChecker
-shellStartCommand: str = DatabaseInfo.get("script-dumps")
-if shellStartCommand is None or shellStartCommand == "":
-    print(Error(success=False, message="Error: not have script-dumps in Database-Information.json", code=1).__str__())
-    sys.exit(1)
-elif "@user" not in shellStartCommand or "@pw" not in shellStartCommand or "@dump" not in shellStartCommand:
-    print(Error(success=False, message="Error: not have @user, @pw, @dump in shellStartCommand", code=2).__str__())
-    sys.exit(2)
-elif DatabaseInfo.get("doker_container") is not None and DatabaseInfo.get("doker_container") != "":
-    if "@doker_container" not in shellStartCommand:
-        print(Error(success=False, message="Error: not have @doker_container in shellStartCommand", code=3).__str__())
-        sys.exit(3)
-
-ignoredFiles: list[str] = [".Dumps.md", "lastDumpsFiles"]
-
-
-def isDockerCommand(command: str) -> bool:
-    """
-    check if the command is a docker command
-    :param command: str, command to check
-    :return: bool, True if the command is a docker command, False if not
-    """
-    if "@doker_container" in command:
-        return True
-    return False
 
 
 def get_default_docker_container() -> str | None:
@@ -46,11 +14,24 @@ def get_default_docker_container() -> str | None:
     get the default docker container
     :return: str, default
     """
-    if isDockerCommand(shellStartCommand) and DatabaseInfo.get("doker_container") is not None and DatabaseInfo.get(
+    if isDockerCommand(AddDumpsCommand) and DatabaseInfo.get("doker_container") is not None and DatabaseInfo.get(
             "doker_container") != "":
         return str(DatabaseInfo.get("doker_container"))
     else:
         return None
+
+
+def get_docker_container(textfieldDockerContainer: tk.Text) -> str | None:
+    NameDockerContainer: str = get_default_docker_container()
+    if NameDockerContainer is not None:  # if is a docker command
+        Name: str = textfieldDockerContainer.get("1.0",
+                                                 "end-1c")  # get the name of the docker container from the textfield
+        if Name == "":  # if the name is empty
+            textfieldDockerContainer.insert("1.0", NameDockerContainer)  # insert the default name
+        else:  # if the name is not empty
+            NameDockerContainer = Name  # set the name of the docker container
+
+    return NameDockerContainer
 
 
 def ignoredFile(txt: str):
@@ -63,6 +44,117 @@ def ignoredFile(txt: str):
         if i == txt:
             return True
     return False
+
+
+def listDatabases() -> list:
+    try:
+        db: DatabaseExecutor = DatabaseExecutor(user=str(DatabaseInfo.get("user")),
+                                                password=str(DatabaseInfo.get("password")),
+                                                host=str(DatabaseInfo.get("host")),
+                                                port=int(str(DatabaseInfo.get("port"))))
+        listDb = db.listDatabases()
+        db.close()
+    except Exception as e:
+        print(Error(success=False, message="Error: %s" % str(e), code=1))
+        return []
+    return listDb
+
+
+def listDatabasesWithoutSytemBase() -> list:
+    """
+    list all databases without system base
+    :return: list[str], list of all databases without system base
+    """
+    listDb: list[str] = []
+    for db in listDatabases():
+        if db == "information_schema" or db == "mysql" or db == "performance_schema" or db == "sys":
+            continue
+        else:
+            listDb += [db]
+    return listDb
+
+
+def ListOfDumps() -> list[str]:
+    """
+    list all dumps in the folder
+    :return: list[str], list of all dumps in the folder
+    """
+    FoldersContained.update()
+    listOfDumps: list[str] = ['all dumps']
+
+    for folder in FoldersContained.folders:
+        if ignoredFile(folder):
+            continue
+        else:
+            f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
+            if f is not None and f.getExtension() == "sql":  # if the file is a sql file
+                sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
+                listOfDumps += [sql.getNameDataBase() + " (" + sql.getDateOfDump() + ")"]
+    return listOfDumps
+
+
+def NumberOfDumps() -> int:
+    """
+    number of dumps in the folder
+    :return: int, number of dumps in the folder
+    """
+    numbersOfDumps: int = 0
+    FoldersContained.update()
+
+    for folder in FoldersContained.folders:
+        if ignoredFile(folder):
+            continue
+        else:
+            f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
+            if f is not None and f.getExtension() == "sql":  # if the file is a sql file
+                numbersOfDumps += 1
+    return numbersOfDumps
+
+
+def CleanDumpsFolder(loadingLabel: tk.Label = None, loadDumps="all dumps") -> Error:
+    """
+    clean the folder of all dumps
+    :return: Error, error message
+    """
+    FoldersContained.update()
+    success: bool = True
+    message: str = "the folder is clean"
+    code: int = 200
+
+    pathLastDumpsFiles = DumpsPath + "/lastDumpsFiles"
+    createFolder(pathLastDumpsFiles)
+
+    print("Start cleaning the folder")
+    loadingLabel.config(text="Start cleaning the folder")
+
+    numFolders: int = 0
+
+    for folder in FoldersContained.folders:
+        if ignoredFile(folder):
+            continue
+        else:
+            numFolders += 1
+            print("Cleaning: " + folder)
+            loadingLabel.config(
+                text="Cleaning: " + folder + "(" + str(numFolders) + "/" + str(len(ListOfDumps())) + ")")
+            f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
+            if f is not None and f.getExtension() == "sql":  # if the file is a sql file
+                sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
+                if loadDumps != "all dumps" and loadDumps != sql.getNameDataBase():
+                    continue
+                else:
+                    moveFile(sql.getPath(), pathLastDumpsFiles)
+            else:
+                print("File not found: " + folder)
+                loadingLabel.config(text="File not found: " + folder)
+                if success:
+                    success = False
+                    message = "Error: file not found\n" + \
+                              "@space- " + folder + "\n"
+                    code = 404
+                else:
+                    message += "@space- " + folder
+    return Error(success=success, message=message, code=code)
 
 
 def ShellRunner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = None,
@@ -89,16 +181,8 @@ def ShellRunner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text
     code: int = 200
 
     # check if is a docker command and get the docker container if is necessary
-    # noinspection PyTypeChecker
-    NameDockerContainer: str = get_default_docker_container()
+    NameDockerContainer: str = get_docker_container(textfieldDockerContainer=textfieldDockerContainer)
     if NameDockerContainer is not None:  # if is a docker command
-        Name: str = textfieldDockerContainer.get("1.0",
-                                                 "end-1c")  # get the name of the docker container from the textfield
-        if Name == "":  # if the name is empty
-            textfieldDockerContainer.insert("1.0", NameDockerContainer)  # insert the default name
-        else:  # if the name is not empty
-            NameDockerContainer = Name  # set the name of the docker container
-
         print("Docker container: " + NameDockerContainer)
 
     # get all dumps in the folder and add them to the server with a shell command to load the dump in the database
@@ -131,19 +215,12 @@ def ShellRunner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text
 
             print("Dumping: " + sql.getNameDataBase() + " (Date of dump: " + sql.getDateOfDump() + ")")
 
-            # shell command
-            # shellStartCommand = "docker exec -i mysql mysql -u @user -p@pw < @dump"
-            # replace @user and @pw with the user and password of the database
-            # replace @dump with the path of the dump file
-            # replace @dump with the path of the dump file
-
-            # noinspection PyTypeChecker
-            command = shellStartCommand.replace("@user", DatabaseInfo.get("user"))
-            # noinspection PyTypeChecker
-            command = command.replace("@pw", DatabaseInfo.get("password"))
-            command = command.replace("@dump", sql.getPath())
-            if NameDockerContainer is not None:  # if is a docker command and have a docker container name to use it
-                command = command.replace("@doker_container", NameDockerContainer)
+            # shell command to dump the database
+            command: str = turnCommandeToExecutable(command=AddDumpsCommand,
+                                                    user=str(DatabaseInfo.get("user")),
+                                                    password=str(DatabaseInfo.get("password")),
+                                                    dump=sql.getPath(),
+                                                    NameDockerContainer=NameDockerContainer)
 
             print("Executing: " + command)
 
@@ -196,71 +273,64 @@ def ShellRunner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text
     return Error(success=success, message=message + "\n" + data, code=code)
 
 
-def ListOfDumps() -> list[str]:
+def GenerateDumps(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = None) -> Error:
     """
-    list all dumps in the folder
-    :return: list[str], list of all dumps in the folder
-    """
-    FoldersContained.update()
-    listOfDumps: list[str] = ['all dumps']
-
-    for folder in FoldersContained.folders:
-        if ignoredFile(folder):
-            continue
-        else:
-            f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
-            if f is not None and f.getExtension() == "sql":  # if the file is a sql file
-                sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
-                listOfDumps += [sql.getNameDataBase() + " (" + sql.getDateOfDump() + ")"]
-    return listOfDumps
-
-
-def NumberOfDumps() -> int:
-    """
-    number of dumps in the folder
-    :return: int, number of dumps in the folder
-    """
-    numbersOfDumps: int = 0
-    FoldersContained.update()
-
-    for folder in FoldersContained.folders:
-        if ignoredFile(folder):
-            continue
-        else:
-            f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
-            if f is not None and f.getExtension() == "sql":  # if the file is a sql file
-                numbersOfDumps += 1
-    return numbersOfDumps
-
-
-def CleanDumpsFolder() -> Error:
-    """
-    clean the folder of all dumps
+    generate a dump of the database
+    :param loadingLabel: tk.Label, label to show the progress of the dump
+    :param textfieldDockerContainer: tk.Text, textfield to show the docker container
     :return: Error, error message
     """
-    FoldersContained.update()
+    import time
     success: bool = True
-    message: str = "the folder is clean"
+    message: str = "the dump is generated"
     code: int = 200
 
-    pathLastDumpsFiles = DumpsPath + "/lastDumpsFiles"
-    createFolder(pathLastDumpsFiles)
+    CleanTerminal()
 
-    for folder in FoldersContained.folders:
-        if ignoredFile(folder):
-            continue
+    CleanDumpsFolder(loadingLabel=loadingLabel)
+
+    print("Dump started")
+
+    # check if is a docker command and get the docker container if is necessary
+    NameDockerContainer: str = get_docker_container(textfieldDockerContainer=textfieldDockerContainer)
+    if NameDockerContainer is not None:  # if is a docker command
+        print("Docker container: " + NameDockerContainer)
+
+    numFolders: int = 0
+
+    for db in listDatabasesWithoutSytemBase():
+        numFolders += 1
+        print("Generate dump: " + db)
+        loadingLabel.config(text="Generate dump: " + db + " (" + str(numFolders) + "/" + str(len(listDatabasesWithoutSytemBase())) + ")")
+        loadingLabel.update()
+
+        # shell command to dump the database
+        date: Date = getActualDate()
+        strDate: str = "(" + date.getYearString() + "-" + date.getMonthString() + "-" + date.getDayString() + ")"
+        command: str = turnCommandeToExecutable(command=GenerateDumpCommand,
+                                                user=str(DatabaseInfo.get("user")),
+                                                password=str(DatabaseInfo.get("password")),
+                                                dump=DumpsPath + "/" + db + "_" + strDate + ".sql",
+                                                NameDockerContainer=NameDockerContainer,
+                                                db=db)
+
+        print("Executing: " + command)
+
+        try:
+            print("Executing: " + command)
+            #os.system(command)
+        except Exception as e:
+            if success:
+                success = False
+                message = "Error to generate\n"
+                code = 406
+            message += "\n" + str(e)
+            print("Error: " + str(e))
         else:
-            f = generateFile(path=DumpsPath + "/" + folder, sp='Dump', debug=True)
-            if f is not None and f.getExtension() == "sql":  # if the file is a sql file
-                sql: dumpSqlFile = dumpSqlFile(path=DumpsPath + "/" + folder)
-                moveFile(sql.getPath(), pathLastDumpsFiles)
-            else:
-                print("File not found: " + folder)
-                if success:
-                    success = False
-                    message = "Error: file not found\n" + \
-                            "    - " + folder + "\n"
-                    code = 404
-                else:
-                    message += "    - " + folder
+            print("Dump success")
+
+        print("Executed: " + db + "\n")
+
+    print("Dump finished")
+
     return Error(success=success, message=message, code=code)

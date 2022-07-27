@@ -5,10 +5,14 @@ from Utilities import *
 ############################## Calendar File Manager #################################################################
 ######################################################################################################################
 
-def CalendarFileManager(start: WeekDay, error: Error, graphique: bool) -> Error:
+def CalendarFileManager(titre: str, description: str, start: WeekDay, error: Error, graphique: bool) -> Error:
     """
     Create and modify a file with a Calendar of the last dump
+    :param titre: str, title of the Calendar
+    :param description: str, description of the Calendar
+    :param start: WeekDay, start of the Calendar
     :param error: Error, error object
+    :param graphique: bool, True if we want to run the program in graphique mode
     :return: None
     """
     result: Error
@@ -30,7 +34,11 @@ def CalendarFileManager(start: WeekDay, error: Error, graphique: bool) -> Error:
             txt: TxtFile = TxtFile(path=f.getPath())  # create a TxtFile object with the file
 
             # create the calendar of the last dump
-            calendar: ErrorCalendar = CreateCalendar(start=start, error=error, graphique=graphique)
+            calendar: ErrorCalendar = CreateCalendar(titre=titre,
+                                                     description=description,
+                                                     start=start,
+                                                     error=error,
+                                                     graphique=graphique)
 
             if txt.data == "":  # if not have data in the file
                 # put the Calendar in the file
@@ -64,10 +72,14 @@ def CalendarFileManager(start: WeekDay, error: Error, graphique: bool) -> Error:
     return result
 
 
-def CreateCalendar(start: WeekDay, error: Error, graphique: bool) -> ErrorCalendar:
+def CreateCalendar(titre: str, description: str, start: WeekDay, error: Error, graphique: bool) -> ErrorCalendar:
     """
     Create and modify a file with a Calendar of the last dump
+    :param titre: str, title of the Calendar
+    :param description: str, description of the Calendar
+    :param start: WeekDay, start of the Calendar
     :param error: Error, error object
+    :param graphique: bool, True if we want to run the program in graphique mode
     :return: None
     """
     # create the content of calendar
@@ -80,8 +92,8 @@ def CreateCalendar(start: WeekDay, error: Error, graphique: bool) -> ErrorCalend
                    space + "- code: " + str(error.code) + "\n"
 
     # create the calendar of the last dump
-    calendar: ErrorCalendar = ErrorCalendar(title="Dumps",
-                                            description="Dumps of the databases",
+    calendar: ErrorCalendar = ErrorCalendar(title=titre,
+                                            description=description,
                                             date=start.dateTime.Date,
                                             start=start,
                                             content=content)  # create a Calendar object with the error
