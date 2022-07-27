@@ -294,10 +294,6 @@ def Run(errorLabel: tk.Label, loadingLabel: tk.Label, textfieldDockerContainer: 
     :param isGenerate: if the command is generate
     :return: None
     """
-    if loadDumps != 'all dumps':
-        loadDumps = loadDumps.split(' ')[0]
-    start: WeekDay = getActualWeekDay()
-
     if isGet:
         isClean = False
         isGenerate = False
@@ -312,8 +308,12 @@ def Run(errorLabel: tk.Label, loadingLabel: tk.Label, textfieldDockerContainer: 
         isClean = False
         isGenerate = False
 
-    titre: str = ""
-    description: str = ""
+    titre: str
+    description: str
+
+    if loadDumps != 'all dumps':
+        loadDumps = loadDumps.split(' ')[0]
+    start: WeekDay = getActualWeekDay()
 
     if isGet:
         error: Error = Runner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
