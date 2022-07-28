@@ -8,7 +8,7 @@ def main(run: str, graphique: bool = True) -> Error:
     :param graphique: bool, True if we want to run the program in graphique mode
     :return: None
     """
-    return Runner(run=run, graphique=graphique)
+    return start(run=run, graphique=graphique)
 
 
 if __name__ == '__main__':

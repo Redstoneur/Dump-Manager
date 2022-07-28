@@ -72,7 +72,7 @@ def turnCommandeToExecutable(command: str, user: str, password: str, dump: str,
     command = command.replace("@pw", password)
     # replace @dump with the path of the dump file
     command = command.replace("@dump", dump)
-    if db is not None: # if the database name is not None
+    if db is not None:  # if the database name is not None
         # replace @db with the database name
         command = command.replace("@db", db)
     if NameDockerContainer is not None:  # if is a docker command and have a docker container name to use it

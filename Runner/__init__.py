@@ -1,9 +1,20 @@
 from Runner.DevFileManager import *
 from Runner.ShellRunner import *
 from Runner.UtileFonction import *
+from Runner.BareMenu import *
 
 
-# from Runner.DbRunner import *
+def start(run: str = "nothing", graphique: bool = False) -> Error:
+    """
+    start the program
+    :param run: str, information or dump
+    :param graphique: bool, if the program is run in graphique mode
+    :return: None
+    """
+    if graphique:
+        return fenetre(run=run)
+    else:
+        return Runner(run=run, graphique=graphique)
 
 
 def fenetre(run: str = "nothing") -> Error:
@@ -43,22 +54,14 @@ def fenetre(run: str = "nothing") -> Error:
     varCheckboxDockercontainer: tk.BooleanVar
 
     # create the menu
-    menuButton: tk.Menu
-    menuUtile: tk.Menu
-    listSubMenuUtile: list[tk.Menu]
-    menuUtileCleanDumpsFolder: tk.Menu
-    listSubMenuUtileCleanDumpsFolder: list[tk.Menu]
-    menuInfoDb: tk.Menu
-    listSubMenuInfoDb: list[tk.Menu]
-    menuAbout: tk.Menu
-    listSubMenuAbout: list[tk.Menu]
+    menu: BareMenu
 
     # create the error object
     error: Error
 
     # define the size of the window
-    longueur: int = 500
-    hauteur: int = 500
+    longueur: int = 600
+    hauteur: int = 600
 
     # define the size of the grid
     grid_rowconfigure_Max: int = 8
@@ -73,74 +76,6 @@ def fenetre(run: str = "nothing") -> Error:
         window.title(ApplicationInformation.get_name() + " " + ApplicationInformation.get_version())
         # define the size of the window
         window.geometry(str(longueur) + "x" + str(hauteur))
-
-        # create the menu bar
-        menuButton = tk.Menu(window)
-
-        # menu utile
-        menuUtile = tk.Menu(menuButton)
-        menuUtile.add_command(label="Run", command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
-                                                               textfieldDockerContainer=textfieldDockerContainer,
-                                                               loadDumps=ComboboxDumps.get(
-                                                                   ComboboxDumps.curselection()), run=run))
-        # menuUtile.add_command(label="Use textfield path add dump", command=lambda: useTextfieldPathAddDump())
-        menuUtile.add_command(label="Default docker container",
-                              command=lambda: textfieldDockerContainerToDefaultWithCheckbox(
-                                  textfieldDockerContainer=textfieldDockerContainer,
-                                  varCheckboxDockercontainer=varCheckboxDockercontainer))
-        menuUtile.add_command(label="Reload", command=lambda: Reload(listeDumps=ComboboxDumps))
-        menuUtile.add_command(label="Clean terminal", command=lambda: CleanDataInformation(errorLabel=errorLabel))
-        menuUtile.add_command(label="Clean Dumps folder",
-                              command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
-                                                  isGet=False, isClean=True, isGenerate=False))
-        menuUtile.add_command(label="Generate Dumps",
-                              command=lambda: Run(errorLabel=errorLabel, loadingLabel=loadingLabel,
-                                                  textfieldDockerContainer=textfieldDockerContainer,
-                                                  isGet=False, isClean=False, isGenerate=True))
-        menuUtile.add_command(label="Quit", command=lambda: window.destroy())
-        menuUtile.add_command(label="Exit", command=lambda: exit())
-
-        menuButton.add_cascade(label="Utile", menu=menuUtile)
-
-        # add the menu Cascade menuInfoDb
-        menuInfoDb = tk.Menu(menuButton, tearoff=0)
-
-        listSubMenuInfoDb: list[tk.Menu] = [tk.Menu(menuInfoDb, tearoff=0) for i in range(3)]
-
-        listSubMenuInfoDb[0].add_command(label="Host : " + AboutDB("host"))
-        listSubMenuInfoDb[0].add_command(label="Port : " + AboutDB("port"))
-        listSubMenuInfoDb[0].add_command(label="user : " + AboutDB("user"))
-        menuInfoDb.add_cascade(label="Database", menu=listSubMenuInfoDb[0])
-
-        listSubMenuInfoDb[1].add_command(label="Path of dump : " + AboutDB("path-dumps"))
-        menuInfoDb.add_cascade(label="Dump", menu=listSubMenuInfoDb[1])
-
-        listSubMenuInfoDb[2].add_command(label="Script for execute dumps : " + AboutDB("script-dumps"))
-        if isDockerCommand(AddDumpsCommand):
-            listSubMenuInfoDb[2].add_command(label="Docker container by default : " + AboutDB("doker_container"))
-        menuInfoDb.add_cascade(label="Script", menu=listSubMenuInfoDb[2])
-
-        menuButton.add_cascade(label="Info DB", menu=menuInfoDb)
-
-        # add the menu Cascade menuAbout
-        menuAbout = tk.Menu(menuButton, tearoff=0)
-
-        listSubMenuAbout: list[tk.Menu] = [tk.Menu(menuAbout, tearoff=0) for i in range(2)]
-
-        listSubMenuAbout[0].add_command(label="Name : " + ApplicationInformation.name)
-        listSubMenuAbout[0].add_command(label="Version : " + ApplicationInformation.version)
-        listSubMenuAbout[0].add_command(label="License : " + str(ApplicationInformation.get("license")))
-        menuAbout.add_cascade(label="About", menu=listSubMenuAbout[0])
-
-        listSubMenuAbout[1].add_command(label="Author : " + ApplicationInformation.author_first_name +
-                                              " " + ApplicationInformation.author_last_name)
-        listSubMenuAbout[1].add_command(label="Email : " + ApplicationInformation.email)
-        listSubMenuAbout[1].add_command(label="Website : " + str(ApplicationInformation.get("website")))
-        menuAbout.add_cascade(label="Contact", menu=listSubMenuAbout[1])
-
-        menuButton.add_cascade(label="About", menu=menuAbout)
-
-        window.config(menu=menuButton)
 
         # create the grid for the window
         for i in range(grid_rowconfigure_Max):
@@ -193,6 +128,8 @@ def fenetre(run: str = "nothing") -> Error:
         else:
             # noinspection PyTypeChecker
             textfieldDockerContainer = None
+            # noinspection PyTypeChecker
+            varCheckboxDockercontainer = None
 
         # position
         row += 1
@@ -271,112 +208,15 @@ def fenetre(run: str = "nothing") -> Error:
         labelVersion.config(font=("Arial", 7))
         labelVersion.grid(row=row, column=grid_columnconfigure_Max - 1, sticky="se")
 
+        # create the menu bar
+        menu = BareMenu(master=window, errorLabel=errorLabel, loadingLabel=loadingLabel,
+                        textfieldDockerContainer=textfieldDockerContainer, ComboboxDumps=ComboboxDumps,
+                        varCheckboxDockercontainer=varCheckboxDockercontainer, run=run)
+        window.config(menu=menu)
+
         window.mainloop()
     except Exception as e:
         print(e)
         return Error(success=False, message=str(e), code=5)
     else:
         return Error(success=True, message="Mode graphique was successfully run", code=200)
-
-
-def Run(errorLabel: tk.Label, loadingLabel: tk.Label, textfieldDockerContainer: tk.Text = None,
-        loadDumps: str = 'all dumps', run: str = "nothing",
-        isGet: bool = True, isClean: bool = False, isGenerate: bool = False) -> None:
-    """
-    display the error in the label
-    :param errorLabel: label to display the error
-    :param loadingLabel: label to display the loading
-    :param textfieldDockerContainer: textfield to display the docker container
-    :param loadDumps: the dumps to load
-    :param run: the command to run
-    :param isGet: if the command is get
-    :param isClean: if the command is clean
-    :param isGenerate: if the command is generate
-    :return: None
-    """
-    if isGet:
-        isClean = False
-        isGenerate = False
-    elif isClean:
-        isGet = False
-        isGenerate = False
-    elif isGenerate:
-        isGet = False
-        isClean = False
-    else:
-        isGet = False
-        isClean = False
-        isGenerate = False
-
-    titre: str
-    description: str
-
-    if loadDumps != 'all dumps':
-        loadDumps = loadDumps.split(' ')[0]
-    start: WeekDay = getActualWeekDay()
-
-    if isGet:
-        error: Error = Runner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
-                              loadDumps=loadDumps, run=run)
-        titre = "Get"
-        description = "Get the dumps"
-    elif isClean:
-        error: Error = CleanDumpsFolder(loadingLabel=loadingLabel)
-        titre = "Clean"
-        description = "Clean the dumps folder"
-    elif isGenerate:
-        error: Error = GenerateDumps(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer)
-        titre = "Generate"
-        description = "Generate the dumps"
-    else:
-        error: Error = Error(success=False, message="Nothing to run", code=5)
-        titre = "Nothing"
-        description = "Nothing to run"
-
-    calendar: ErrorCalendar = CreateCalendar(titre=titre, description=description,
-                                             start=start, error=error, graphique=True)
-    loadingLabel.config(text=" ")
-    loadingLabel.update()
-    errorLabel.config(text=calendar.__str__())
-    errorLabel.update()
-
-    # create a file with a Calendar of the last dump
-    CalendarFileManager(titre=titre, description=description,
-                        start=start, error=error, graphique=False)
-    # create a file log with the error
-    LogFileManager(error=error)
-
-
-def Runner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = None, loadDumps: str = 'all dumps',
-           run: str = "nothing",
-           graphique: bool = False) -> Error:
-    """
-    Run the program
-    :param loadingLabel: tk.Label, label to display the error
-    :param textfieldDockerContainer: tk.Text, textfield to display the docker container
-    :param loadDumps: str, information or dump
-    :param run: str, information or dump
-    :param graphique: bool, if the program is run in graphique mode
-    :return: Error, error object
-    """
-    CleanTerminal()
-
-    error: Error
-    start: WeekDay = getActualWeekDay()
-
-    if graphique:
-        error = fenetre(run=run)
-    else:
-        if information():  # if read information
-            if run == "debugN1":  # if run in debug mode
-                print("\nDebug mode N1")
-                error = Error(success=True, message="Debug mode N1", code=2109)
-            elif run == "shell":  # if run shell
-                error = ShellRunner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
-                                    loadDumps=loadDumps)
-            else:  # if run nothing
-                error = Error(success=False, message="run not found", code=3)
-        else:  # if not read information
-            error = Error(success=False, message="Error: information", code=4)
-
-    return error

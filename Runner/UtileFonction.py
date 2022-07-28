@@ -1,7 +1,5 @@
-import tkinter as tk
-from Utilities import *
-from Runner.DevFileManager.ApplicationInformation import *
-from Runner.ShellRunner import DumpsPath, ListOfDumps, isDumpSqlFile, DatabaseInfo, get_default_docker_container
+from Runner.DevFileManager import *
+from Runner.ShellRunner import *
 
 ApplicationInformation: ApplicationInformation = ApplicationInformation("./Data/package.json")
 my_os: str = plt.system()
@@ -99,52 +97,6 @@ def textfieldDockerContainerToDefaultWithCheckbox(textfieldDockerContainer: tk.T
         textfieldDockerContainerToDefault(textfieldDockerContainer=textfieldDockerContainer)
 
 
-def AboutDB(txt: str) -> str:
-    """
-    get the information of the database
-    :param txt: str, text of the database
-    :return: str | None | dict, information of the database
-    """
-    if txt == "host":
-        host: str = str(DatabaseInfo.get("host"))
-        if host is not None or host != "":
-            return host
-        else:
-            return "None"
-    elif txt == "port":
-        port: str = str(DatabaseInfo.get("port"))
-        if port is not None or port != "":
-            return port
-        else:
-            return "None"
-    elif txt == "user":
-        user: str = str(DatabaseInfo.get("user"))
-        if user is not None or user != "":
-            return user
-        else:
-            return "None"
-    elif txt == "path-dumps":
-        path_dumps: str = DumpsPath
-        if path_dumps is not None or path_dumps != "":
-            return path_dumps
-        else:
-            return "None"
-    elif txt == "doker_container":
-        doker_container: str = str(DatabaseInfo.get("doker_container"))
-        if doker_container is not None or doker_container != "":
-            return doker_container
-        else:
-            return "None"
-    elif txt == "script-dumps":
-        script_dumps: str = str(DatabaseInfo.get("script-dumps"))
-        if script_dumps is not None or script_dumps != "":
-            return script_dumps
-        else:
-            return "None"
-    else:
-        return "Error: information"
-
-
 def information() -> bool:
     """
     print information about the program
@@ -160,3 +112,108 @@ def information() -> bool:
     else:  # if don't have information
         print("Error: information")
         return False
+
+
+def Runner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = None, loadDumps: str = 'all dumps',
+           run: str = "nothing",
+           graphique: bool = False) -> Error:
+    """
+    Run the program
+    :param loadingLabel: tk.Label, label to display the error
+    :param textfieldDockerContainer: tk.Text, textfield to display the docker container
+    :param loadDumps: str, information or dump
+    :param run: str, information or dump
+    :param graphique: bool, if the program is run in graphique mode
+    :return: Error, error object
+    """
+    CleanTerminal()
+
+    error: Error
+    start: WeekDay = getActualWeekDay()
+
+    if information():  # if read information
+        if run == "debugN1":  # if run in debug mode
+            print("\nDebug mode N1")
+            error = Error(success=True, message="Debug mode N1", code=2109)
+        elif run == "shell":  # if run shell
+            error = ShellRunner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
+                                loadDumps=loadDumps)
+        else:  # if run nothing
+            error = Error(success=False, message="run not found", code=3)
+    else:  # if not read information
+        error = Error(success=False, message="Error: information", code=4)
+
+    if not graphique:
+        CalendarFileManager(titre="Get", description="Get the dumps",
+                            start=start, error=error, graphique=False)
+        LogFileManager(error=error)
+
+    return error
+
+
+def Run(errorLabel: tk.Label, loadingLabel: tk.Label, textfieldDockerContainer: tk.Text = None,
+        loadDumps: str = 'all dumps', run: str = "nothing",
+        isGet: bool = True, isClean: bool = False, isGenerate: bool = False) -> None:
+    """
+    display the error in the label
+    :param errorLabel: label to display the error
+    :param loadingLabel: label to display the loading
+    :param textfieldDockerContainer: textfield to display the docker container
+    :param loadDumps: the dumps to load
+    :param run: the command to run
+    :param isGet: if the command is get
+    :param isClean: if the command is clean
+    :param isGenerate: if the command is generate
+    :return: None
+    """
+    if isGet:
+        isClean = False
+        isGenerate = False
+    elif isClean:
+        isGet = False
+        isGenerate = False
+    elif isGenerate:
+        isGet = False
+        isClean = False
+    else:
+        isGet = False
+        isClean = False
+        isGenerate = False
+
+    titre: str
+    description: str
+
+    if loadDumps != 'all dumps':
+        loadDumps = loadDumps.split(' ')[0]
+    start: WeekDay = getActualWeekDay()
+
+    if isGet:
+        error: Error = Runner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
+                              loadDumps=loadDumps, run=run)
+        titre = "Get"
+        description = "Get the dumps"
+    elif isClean:
+        error: Error = CleanDumpsFolder(loadingLabel=loadingLabel)
+        titre = "Clean"
+        description = "Clean the dumps folder"
+    elif isGenerate:
+        error: Error = GenerateDumps(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer)
+        titre = "Generate"
+        description = "Generate the dumps"
+    else:
+        error: Error = Error(success=False, message="Nothing to run", code=5)
+        titre = "Nothing"
+        description = "Nothing to run"
+
+    calendar: ErrorCalendar = CreateCalendar(titre=titre, description=description,
+                                             start=start, error=error, graphique=True)
+    loadingLabel.config(text=" ")
+    loadingLabel.update()
+    errorLabel.config(text=calendar.__str__())
+    errorLabel.update()
+
+    # create a file with a Calendar of the last dump
+    CalendarFileManager(titre=titre, description=description,
+                        start=start, error=error, graphique=False)
+    # create a file log with the error
+    LogFileManager(error=error)
