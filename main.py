@@ -6,7 +6,7 @@ def main(run: str, graphique: bool = True) -> Error:
     main function of the program
     :param run: str, information or dump
     :param graphique: bool, True if we want to run the program in graphique mode
-    :return: None
+    :return: Error, error if there is one
     """
     return start(run=run, graphique=graphique)
 

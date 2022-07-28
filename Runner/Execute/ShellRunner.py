@@ -1,5 +1,5 @@
-import tkinter as tk
-from Runner.varShellRunner import *
+from Runner.LineFrame.DataManagerFrame import *
+from Runner.Execute.varShellRunner import *
 
 
 ######################################################################################################################
@@ -19,17 +19,39 @@ def get_default_docker_container() -> str | None:
         return None
 
 
-def get_docker_container(textfieldDockerContainer: tk.Text) -> str | None:
-    NameDockerContainer: str = get_default_docker_container()
+def get_default_user_name() -> str:
+    """
+    get the default user name
+    :return: str, user name
+    """
+    return str(DatabaseInfo.get("user"))
+
+
+def get_docker_container(DockerFrame: DataManagerFrame) -> str | None:
+    NameDockerContainer: str = DockerFrame.get_default()
     if NameDockerContainer is not None:  # if is a docker command
-        Name: str = textfieldDockerContainer.get("1.0",
-                                                 "end-1c")  # get the name of the docker container from the textfield
+        Name: str = DockerFrame.get_textfield_value()
         if Name == "":  # if the name is empty
-            textfieldDockerContainer.insert("1.0", NameDockerContainer)  # insert the default name
+            DockerFrame.set_default(get_default_docker_container())
         else:  # if the name is not empty
             NameDockerContainer = Name  # set the name of the docker container
 
     return NameDockerContainer
+
+
+def get_user_name(UserFrame: DataManagerFrame = None) -> str:
+    """
+    get the user name
+    :return: str, user name
+    """
+    UserName: str = UserFrame.get_default()
+    Name: str = UserFrame.get_textfield_value()
+    if Name == "":  # if the name is empty
+        UserFrame.set_default(get_default_user_name())
+    else:  # if the name is not empty
+        UserName = Name  # set the name of the user
+
+    return UserName
 
 
 def ignoredFile(txt: str):
@@ -57,6 +79,7 @@ def listDatabases() -> list:
         return []
     return listDb
 
+
 def ignoredDatabase(db: str) -> bool:
     """
     check if the database is ignored
@@ -67,6 +90,7 @@ def ignoredDatabase(db: str) -> bool:
         if i == db:
             return True
     return False
+
 
 def listDatabasesWithoutSytemBase() -> list:
     """
@@ -165,11 +189,15 @@ def CleanDumpsFolder(loadingLabel: tk.Label = None, loadDumps="all dumps") -> Er
     return Error(success=success, message=message, code=code)
 
 
-def ShellRunner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = None,
+def ShellRunner(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = None, UserFrame: DataManagerFrame = None,
                 loadDumps: str = 'all dumps') -> Error:
     """
     dump all databases with a shell command
-    :return: bool, True if the program worked, False if not
+    :param loadingLabel: tk.Label, loading label
+    :param DockerFrame: DataManagerFrame, docker frame
+    :param UserFrame: DataManagerFrame, user frame
+    :param loadDumps: str, load dumps
+    :return: Error, error message
     """
     print("Dump started")
     numbersOfDumpsTheoretical: int = NumberOfDumps()
@@ -188,8 +216,10 @@ def ShellRunner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text
     message: str = "success"
     code: int = 200
 
+    user: str = get_user_name(UserFrame)
+
     # check if is a docker command and get the docker container if is necessary
-    NameDockerContainer: str = get_docker_container(textfieldDockerContainer=textfieldDockerContainer)
+    NameDockerContainer: str = get_docker_container(DockerFrame=DockerFrame)
     if NameDockerContainer is not None:  # if is a docker command
         print("Docker container: " + NameDockerContainer)
 
@@ -225,7 +255,7 @@ def ShellRunner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text
 
             # shell command to dump the database
             command: str = turnCommandeToExecutable(command=AddDumpsCommand,
-                                                    user=str(DatabaseInfo.get("user")),
+                                                    user=user,
                                                     password=str(DatabaseInfo.get("password")),
                                                     dump=sql.getPath(),
                                                     NameDockerContainer=NameDockerContainer)
@@ -281,11 +311,13 @@ def ShellRunner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text
     return Error(success=success, message=message + "\n" + data, code=code)
 
 
-def GenerateDumps(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = None) -> Error:
+def GenerateDumps(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = None,
+                  UserFrame: DataManagerFrame = None) -> Error:
     """
     generate a dump of the database
     :param loadingLabel: tk.Label, label to show the progress of the dump
-    :param textfieldDockerContainer: tk.Text, textfield to show the docker container
+    :param DockerFrame: DataManagerFrame, frame to show the docker container
+    :param UserFrame: DataManagerFrame, frame to show the user
     :return: Error, error message
     """
     success: bool = True
@@ -298,8 +330,10 @@ def GenerateDumps(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Te
 
     print("Dump started")
 
+    user: str = get_user_name(UserFrame)
+
     # check if is a docker command and get the docker container if is necessary
-    NameDockerContainer: str = get_docker_container(textfieldDockerContainer=textfieldDockerContainer)
+    NameDockerContainer: str = get_docker_container(DockerFrame=DockerFrame)
     if NameDockerContainer is not None:  # if is a docker command
         print("Docker container: " + NameDockerContainer)
 
@@ -316,7 +350,7 @@ def GenerateDumps(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Te
         date: Date = getActualDate()
         strDate: str = "(" + date.getYearString() + "-" + date.getMonthString() + "-" + date.getDayString() + ")"
         command: str = turnCommandeToExecutable(command=GenerateDumpCommand,
-                                                user=str(DatabaseInfo.get("user")),
+                                                user=user,
                                                 password=str(DatabaseInfo.get("password")),
                                                 dump=DumpsPath + "/" + db + "_" + strDate + ".sql",
                                                 NameDockerContainer=NameDockerContainer,

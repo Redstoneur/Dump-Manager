@@ -1,5 +1,4 @@
-from Utilities import *
-from Runner.UtileFonction import *
+from Runner.Execute.UtileFonction import *
 
 
 #####################################################################################################################
@@ -8,7 +7,10 @@ from Runner.UtileFonction import *
 
 class BareMenu(tk.Menu):
     """
-class of the menu
+    class of the menu
+    @description: set the menu
+    @author: Redstoneur
+    @version: 1.0
     """
 
     menuUtile: tk.Menu
@@ -18,25 +20,29 @@ class of the menu
     listSubMenuAbout: list[tk.Menu]
 
     def __init__(self, master: tk.Tk, errorLabel: tk.Label, loadingLabel: tk.Label,
-                 textfieldDockerContainer: tk.Text = None, ComboboxDumps: tk.Listbox = None,
-                 varCheckboxDockercontainer: tk.BooleanVar = None, run: str = "nothing") -> None:
+                 DockerFrame: DataManagerFrame = None, UserFrame: DataManagerFrame = None,
+                 ComboboxDumps: tk.Listbox = None, run: str = "nothing") -> None:
         """
+        init of the class
+        @description: function to init the class
         :param master: tk.Tk, main window
+        :return: None
         """
         super().__init__(master)
         self.master = master
         self.errorLabel = errorLabel
         self.loadingLabel = loadingLabel
-        self.textfieldDockerContainer = textfieldDockerContainer
+        self.DockerFrame = DockerFrame
+        self.UserFrame = UserFrame
         self.ComboboxDumps = ComboboxDumps
-        self.varCheckboxDockercontainer = varCheckboxDockercontainer
         self.run = run
         self.create_menu()
 
     def create_menu(self) -> None:
         """
         create menu
-        :return:
+        @description: function to create the menu
+        :return: None
         """
         # add menu utile
         self.menuUtile = tk.Menu(self)
@@ -56,18 +62,18 @@ class of the menu
     def create_menu_utile(self) -> None:
         """
         create menu utile
-        :return:
+        @description: function to create the menu utile
+        :return: None
         """
         self.menuUtile.add_command(label="Run",
                                    command=lambda: Run(errorLabel=self.errorLabel, loadingLabel=self.loadingLabel,
-                                                       textfieldDockerContainer=self.textfieldDockerContainer,
+                                                       DockerFrame=self.DockerFrame, UserFrame=self.UserFrame,
                                                        loadDumps=self.ComboboxDumps.get(
                                                            self.ComboboxDumps.curselection()), run=self.run))
         # menuUtile.add_command(label="Use textfield path add dump", command=lambda: useTextfieldPathAddDump())
+        self.menuUtile.add_command(label="Default user", command=lambda: self.UserFrame.set_default())
         self.menuUtile.add_command(label="Default docker container",
-                                   command=lambda: textfieldDockerContainerToDefaultWithCheckbox(
-                                       textfieldDockerContainer=self.textfieldDockerContainer,
-                                       varCheckboxDockercontainer=self.varCheckboxDockercontainer))
+                                   command=lambda: self.DockerFrame.set_default())
         self.menuUtile.add_command(label="Reload", command=lambda: Reload(listeDumps=self.ComboboxDumps))
         self.menuUtile.add_command(label="Clean terminal",
                                    command=lambda: CleanDataInformation(errorLabel=self.errorLabel))
@@ -76,7 +82,7 @@ class of the menu
                                                        isGet=False, isClean=True, isGenerate=False))
         self.menuUtile.add_command(label="Generate Dumps",
                                    command=lambda: Run(errorLabel=self.errorLabel, loadingLabel=self.loadingLabel,
-                                                       textfieldDockerContainer=self.textfieldDockerContainer,
+                                                       DockerFrame=self.DockerFrame, UserFrame=self.UserFrame,
                                                        isGet=False, isClean=False, isGenerate=True))
         self.menuUtile.add_command(label="Quit", command=lambda: self.master.destroy())
         self.menuUtile.add_command(label="Exit", command=lambda: exit())
@@ -84,9 +90,10 @@ class of the menu
     def create_menu_info_db(self) -> None:
         """
         create menu info db
-        :return:
+        @description: function to create the menu info db
+        :return: None
         """
-        self.listSubMenuInfoDb: list[tk.Menu] = [tk.Menu(self.menuInfoDb, tearoff=0) for i in range(3)]
+        self.listSubMenuInfoDb: list[tk.Menu] = [tk.Menu(self.menuInfoDb, tearoff=0) for _ in range(3)]
 
         self.listSubMenuInfoDb[0].add_command(label="Host : " + self.AboutDB("host"))
         self.listSubMenuInfoDb[0].add_command(label="Port : " + self.AboutDB("port"))
@@ -107,9 +114,10 @@ class of the menu
     def create_menu_about(self) -> None:
         """
         create menu about
-        :return:
+        @description: function to create the menu about
+        :return: None
         """
-        self.listSubMenuAbout: list[tk.Menu] = [tk.Menu(self.menuAbout, tearoff=0) for i in range(2)]
+        self.listSubMenuAbout: list[tk.Menu] = [tk.Menu(self.menuAbout, tearoff=0) for _ in range(2)]
 
         self.listSubMenuAbout[0].add_command(label="Name : " + ApplicationInformation.name)
         self.listSubMenuAbout[0].add_command(label="Version : " + ApplicationInformation.version)
@@ -122,9 +130,11 @@ class of the menu
         self.listSubMenuAbout[1].add_command(label="Website : " + str(ApplicationInformation.get("website")))
         self.menuAbout.add_cascade(label="Contact", menu=self.listSubMenuAbout[1])
 
-    def AboutDB(self, txt: str) -> str:
+    @staticmethod
+    def AboutDB(txt: str) -> str:
         """
         get the information of the database
+        @description: function to get the information of the database
         :param txt: str, text of the database
         :return: str | None | dict, information of the database
         """

@@ -82,7 +82,6 @@ class ApplicationInformation:
         get name of the program
         :return: str, name of the program
         """
-
         return self.name
 
     def get_version(self) -> str:
@@ -90,7 +89,6 @@ class ApplicationInformation:
         get version of the program
         :return: str, version of the program
         """
-
         return self.version
 
     def get_description(self) -> str:
@@ -98,7 +96,6 @@ class ApplicationInformation:
         get description of the program
         :return: str, description of the program
         """
-
         return self.description
 
     def get_author_first_name(self) -> str:
@@ -106,7 +103,6 @@ class ApplicationInformation:
         get first name of the author
         :return: str, first name of the author
         """
-
         return self.author_first_name
 
     def get_author_last_name(self) -> str:
@@ -114,7 +110,6 @@ class ApplicationInformation:
         get last name of the author
         :return: str, last name of the author
         """
-
         return self.author_last_name
 
     def get_author(self) -> str:
@@ -122,7 +117,6 @@ class ApplicationInformation:
         get author of the program
         :return: str, author of the program
         """
-
         return self.author_first_name + " " + self.author_last_name
 
     def get_email(self) -> str:
@@ -130,5 +124,4 @@ class ApplicationInformation:
         get email of the author
         :return: str, email of the author
         """
-
         return self.email

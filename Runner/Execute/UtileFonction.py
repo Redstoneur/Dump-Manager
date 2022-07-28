@@ -1,8 +1,6 @@
 from Runner.DevFileManager import *
-from Runner.ShellRunner import *
-
-ApplicationInformation: ApplicationInformation = ApplicationInformation("./Data/package.json")
-my_os: str = plt.system()
+from Runner.Execute.ShellRunner import *
+from Runner.LineFrame import *
 
 
 def CleanDataInformation(errorLabel: tk.Label = None) -> None:
@@ -21,6 +19,7 @@ def AddDump(textfieldPath: tk.Text, listeDumps: tk.Listbox) -> None:
     """
     add a dump in the list of dumps
     :param textfieldPath: str, path of the dump
+    :param listeDumps: list, list of dumps
     :return: None
     """
     path: str = textfieldPath.get("1.0", "end-1c")
@@ -58,45 +57,6 @@ def Reload(listeDumps: tk.Listbox) -> None:
     listeDumps.selection_set(0)
 
 
-def textfieldDockerContainerLocker(textfieldDockerContainer: tk.Text,
-                                   varCheckboxDockercontainer: tk.BooleanVar) -> None:
-    """
-    lock or unlock the textfieldDockerContainer
-    :param textfieldDockerContainer: tk.Text, textfieldDockerContainer
-    :param varCheckboxDockercontainer: tk.BooleanVar, varCheckboxDockercontainer
-    :return: None
-    """
-    if varCheckboxDockercontainer.get():
-        textfieldDockerContainer.config(state="disabled")
-    else:
-        textfieldDockerContainer.config(state="normal")
-
-
-def textfieldDockerContainerToDefault(textfieldDockerContainer: tk.Text) -> None:
-    """
-    set the textfieldDockerContainer to default
-    :param textfieldDockerContainer: tk.Text, textfieldDockerContainer
-    :return: None
-    """
-    textfieldDockerContainer.delete("1.0", "end-1c")
-    textfieldDockerContainer.insert("1.0", get_default_docker_container())
-
-
-def textfieldDockerContainerToDefaultWithCheckbox(textfieldDockerContainer: tk.Text,
-                                                  varCheckboxDockercontainer: tk.BooleanVar) -> None:
-    """
-    set the textfieldDockerContainer to default
-    :param textfieldDockerContainer: tk.Text, textfieldDockerContainer
-    :return: None
-    """
-    if varCheckboxDockercontainer.get():
-        textfieldDockerContainer.config(state="normal")
-        textfieldDockerContainerToDefault(textfieldDockerContainer=textfieldDockerContainer)
-        textfieldDockerContainer.config(state="disabled")
-    else:
-        textfieldDockerContainerToDefault(textfieldDockerContainer=textfieldDockerContainer)
-
-
 def information() -> bool:
     """
     print information about the program
@@ -114,13 +74,12 @@ def information() -> bool:
         return False
 
 
-def Runner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = None, loadDumps: str = 'all dumps',
-           run: str = "nothing",
-           graphique: bool = False) -> Error:
+def Runner(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = None, UserFrame: DataManagerFrame = None,
+           loadDumps: str = 'all dumps', run: str = "nothing", graphique: bool = False) -> Error:
     """
     Run the program
     :param loadingLabel: tk.Label, label to display the error
-    :param textfieldDockerContainer: tk.Text, textfield to display the docker container
+    :param DockerFrame: DataManagerFrame, frame to display the docker container
     :param loadDumps: str, information or dump
     :param run: str, information or dump
     :param graphique: bool, if the program is run in graphique mode
@@ -136,7 +95,7 @@ def Runner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = No
             print("\nDebug mode N1")
             error = Error(success=True, message="Debug mode N1", code=2109)
         elif run == "shell":  # if run shell
-            error = ShellRunner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
+            error = ShellRunner(loadingLabel=loadingLabel, DockerFrame=DockerFrame, UserFrame=UserFrame,
                                 loadDumps=loadDumps)
         else:  # if run nothing
             error = Error(success=False, message="run not found", code=3)
@@ -151,14 +110,14 @@ def Runner(loadingLabel: tk.Label = None, textfieldDockerContainer: tk.Text = No
     return error
 
 
-def Run(errorLabel: tk.Label, loadingLabel: tk.Label, textfieldDockerContainer: tk.Text = None,
-        loadDumps: str = 'all dumps', run: str = "nothing",
+def Run(errorLabel: tk.Label, loadingLabel: tk.Label, DockerFrame: DataManagerFrame = None,
+        UserFrame: DataManagerFrame = None, loadDumps: str = 'all dumps', run: str = "nothing",
         isGet: bool = True, isClean: bool = False, isGenerate: bool = False) -> None:
     """
     display the error in the label
     :param errorLabel: label to display the error
     :param loadingLabel: label to display the loading
-    :param textfieldDockerContainer: textfield to display the docker container
+    :param DockerFrame: frame to display the docker container
     :param loadDumps: the dumps to load
     :param run: the command to run
     :param isGet: if the command is get
@@ -188,7 +147,7 @@ def Run(errorLabel: tk.Label, loadingLabel: tk.Label, textfieldDockerContainer: 
     start: WeekDay = getActualWeekDay()
 
     if isGet:
-        error: Error = Runner(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer,
+        error: Error = Runner(loadingLabel=loadingLabel, DockerFrame=DockerFrame, UserFrame=UserFrame,
                               loadDumps=loadDumps, run=run)
         titre = "Get"
         description = "Get the dumps"
@@ -197,7 +156,7 @@ def Run(errorLabel: tk.Label, loadingLabel: tk.Label, textfieldDockerContainer: 
         titre = "Clean"
         description = "Clean the dumps folder"
     elif isGenerate:
-        error: Error = GenerateDumps(loadingLabel=loadingLabel, textfieldDockerContainer=textfieldDockerContainer)
+        error: Error = GenerateDumps(loadingLabel=loadingLabel, DockerFrame=DockerFrame, UserFrame=UserFrame, )
         titre = "Generate"
         description = "Generate the dumps"
     else:

@@ -1,4 +1,5 @@
 import sys
+from Runner.DevFileManager.ApplicationInformation import *
 from Utilities import *
 
 
@@ -81,6 +82,8 @@ def turnCommandeToExecutable(command: str, user: str, password: str, dump: str,
     return command
 
 
+ApplicationInformation: ApplicationInformation = ApplicationInformation("./Data/package.json")
+my_os: str = plt.system()
 DatabaseInfo: JsonFile = JsonFile("./Data/Database-Information.json")
 
 # noinspection PyTypeChecker
