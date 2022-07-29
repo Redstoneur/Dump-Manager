@@ -13,7 +13,7 @@ def LogFileManager(error: Error) -> Error:
     """
     result: Error
     b: bool = True
-    path: str = "./Data/log.txt"
+    path: str = "./Variable/log.txt"
 
     print("\nCreating log file")
 

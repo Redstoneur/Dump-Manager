@@ -4,3 +4,4 @@
 # Don't commit log file and history file.
 /Data/log.txt
 /Data/calendar.txt
+/reboot.py

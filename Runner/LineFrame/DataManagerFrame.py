@@ -2,12 +2,12 @@ from Runner.LineFrame.LineFrame import *
 
 
 #####################################################################################################################
-############################# Class Data Manager Frame ##############################################################
+############################# Class Variable Manager Frame ##############################################################
 #####################################################################################################################
 
 class DataManagerFrame(LineFrame):
     """
-    Class Data Manager Frame
+    Class Variable Manager Frame
     @description: class to create the data manager frame
     @author: Redstoneur
     @version: 1.0
@@ -24,8 +24,8 @@ class DataManagerFrame(LineFrame):
                  textlabel: str, defaultValueTextfield: str, textCheckbox: str,
                  defaultValueCheckbox: bool = True, isPassword: bool = False) -> None:
         """
-        init of the class
-        @description: function to init the class
+        Start of the class
+        @description: function to Start the class
         :param master: tk.Tk, main window
         :return: None
         """

@@ -24,8 +24,8 @@ class BareMenu(tk.Menu):
                  PassWordFrame: DataManagerFrame = None,
                  ComboboxDumps: tk.Listbox = None, run: str = "nothing") -> None:
         """
-        init of the class
-        @description: function to init the class
+        Start of the class
+        @description: function to Start the class
         :param master: tk.Tk, main window
         :param errorLabel: tk.Label, label of error
         :param loadingLabel: tk.Label, label of loading

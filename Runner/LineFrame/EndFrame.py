@@ -16,8 +16,8 @@ class EndFrame(LineFrame):
 
     def __init__(self, master: tk.Tk, grid_columnconfigure_Max: int) -> None:
         """
-        init of the class
-        @description: function to init the class
+        Start of the class
+        @description: function to Start the class
         :param master: tk.Tk, main window
         :return: None
         """
