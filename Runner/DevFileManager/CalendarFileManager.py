@@ -17,7 +17,7 @@ def CalendarFileManager(titre: str, description: str, start: WeekDay, error: Err
     """
     result: Error
     b: bool = True
-    path: str = "./Variable/calendar.txt"
+    path: str = "./Data/calendar.txt"
 
     print("\nCreating Calendar of the last dump")
 

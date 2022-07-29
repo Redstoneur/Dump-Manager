@@ -1,7 +1,3 @@
 # Don't commit any changes to the repository.
-/Data/Dumps/
-
-# Don't commit log file and history file.
-/Data/log.txt
-/Data/calendar.txt
+/Data/
 /reboot.py
