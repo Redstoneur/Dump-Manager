@@ -1,4 +1,4 @@
-# Application : Dump-Manager
+# Application : Dump Manager
 
 ## Sommaire
 
@@ -9,7 +9,7 @@
 - [Dump-Manager-Tests](#dump-manager-tests)
 - [Dump-Manager-History](#dump-manager-history)
 
-## Dump-Manager
+## Dump Manager
 
 Dump-Manager is a simple tool to manage dumps.
 It simplifies to add a new dump in the database and to manage it.
@@ -52,7 +52,7 @@ To use Dump-Manager, you need to put dumps in the folder `./Data/Dumps`
 
 1. when the project was created
 
-    - the project was created in the year 2022 by Alipio SIMOES.
+    - the project was created in the year 2022 by Alipio SIMOES
 
 2. Why the project was created
 
@@ -61,5 +61,5 @@ To use Dump-Manager, you need to put dumps in the folder `./Data/Dumps`
 
 3. What is the current version of the project
 
-    - the current version is 1.4.2
+    - the current version is 1.4.4
 

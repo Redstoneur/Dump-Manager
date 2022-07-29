@@ -1,8 +1,8 @@
-from Runner import *
+import sys
 from Start import *
 
 
-def main(run: str, graphique: bool = True) -> Error:
+def main(run: str, graphique: bool = True):
     """
     main function of the program
     :param run: str, information or dump
@@ -46,6 +46,7 @@ if __name__ == '__main__':
         r.reboot = reboot
     init(language=language, reboot=r.reboot)
 
+    from Runner import *
 
     # run the program
     result: Error = main(run=run, graphique=graphique)

@@ -1,6 +1,8 @@
+from Start.Variable.Variable import PathFolderDumps
+
 package: dict = {
   "name": "Dump Manager",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "date-created": "2022-07-06",
   "description-fr": "Dump Manager est un outil de gestion des dumps de bases de données. Il permet de gérer les dumps de bases de données et de les restaurer.",
   "description-en": "Dump Manager is a tool to manage database dumps. It allows you to manage database dumps and restore them.",
@@ -35,8 +37,8 @@ package: dict = {
       }
     ]
   },
-  "information_fr": "mettez votre dump dans le dossier './Dumps'",
-  "information_en": "put your dump un the folder './Dumps'",
+  "information_fr": "mettez votre dump dans le dossier '" + PathFolderDumps + "'",
+  "information_en": "put your dump un the folder '" + PathFolderDumps + "'",
   "author": {
     "lastName": "SIMOES",
     "firstName": "Alipio",

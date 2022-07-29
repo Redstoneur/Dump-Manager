@@ -1,6 +1,8 @@
+from Start.Variable.Variable import PathFolderDumps
+
 Dumps: str = """# information
 
-By default, the dumps are stored in the `Variable\Dumps` folder.
+By default, the dumps are stored in the `""" + PathFolderDumps + """` folder.
 You have to put un this folder the dumps that you want to use.
 <dl>
     <dt>You have to name the file's dump with the following format :</dt>
