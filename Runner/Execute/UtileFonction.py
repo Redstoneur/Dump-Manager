@@ -81,6 +81,8 @@ def Runner(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = None, 
     Run the program
     :param loadingLabel: tk.Label, label to display the error
     :param DockerFrame: DataManagerFrame, frame to display the docker container
+    :param UserFrame: DataManagerFrame, frame to display the user
+    :param PassWordFrame: DataManagerFrame, frame to display the password
     :param loadDumps: str, information or dump
     :param run: str, information or dump
     :param graphique: bool, if the program is run in graphique mode
