@@ -114,20 +114,20 @@ class Window(tk.Tk):
                             sticky="nsew")
 
         # position
-        # row += 1
-        # self.grid_rowconfigure(row, weight=1)
-        #
-        # PassWordkey: str = "user"
-        # self.PassWordFrame = DataManagerFrame(master=self,
-        #                                       grid_columnconfigure_Max=self.grid_columnconfigure_Max,
-        #                                       textlabel=PassWordkey,
-        #                                       defaultValueTextfield=str(DatabaseInfo.get(PassWordkey)),
-        #                                       textCheckbox="Use value",
-        #                                       defaultValueCheckbox=True,
-        #                                       isPassword=True)
-        #
-        # self.PassWordFrame.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max,
-        #                         sticky="nsew")
+        row += 1
+        self.grid_rowconfigure(row, weight=1)
+
+        PassWordkey: str = "password"
+        self.PassWordFrame = DataManagerFrame(master=self,
+                                              grid_columnconfigure_Max=self.grid_columnconfigure_Max,
+                                              textlabel=PassWordkey,
+                                              defaultValueTextfield=str(DatabaseInfo.get(PassWordkey)),
+                                              textCheckbox="Use value",
+                                              defaultValueCheckbox=True,
+                                              isPassword=True)
+
+        self.PassWordFrame.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max,
+                                sticky="nsew")
 
         if isDockerCommand(AddDumpsCommand):
             # position
