@@ -75,7 +75,8 @@ def information() -> bool:
 
 
 def Runner(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = None, UserFrame: DataManagerFrame = None,
-           loadDumps: str = 'all dumps', run: str = "nothing", graphique: bool = False) -> Error:
+           PassWordFrame: DataManagerFrame = None, loadDumps: str = 'all dumps', run: str = "nothing",
+           graphique: bool = False) -> Error:
     """
     Run the program
     :param loadingLabel: tk.Label, label to display the error
@@ -96,7 +97,7 @@ def Runner(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = None, 
             error = Error(success=True, message="Debug mode N1", code=2109)
         elif run == "shell":  # if run shell
             error = ShellRunner(loadingLabel=loadingLabel, DockerFrame=DockerFrame, UserFrame=UserFrame,
-                                loadDumps=loadDumps)
+                                PassWordFrame=PassWordFrame, loadDumps=loadDumps)
         else:  # if run nothing
             error = Error(success=False, message="run not found", code=3)
     else:  # if not read information
@@ -111,13 +112,15 @@ def Runner(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = None, 
 
 
 def Run(errorLabel: tk.Label, loadingLabel: tk.Label, DockerFrame: DataManagerFrame = None,
-        UserFrame: DataManagerFrame = None, loadDumps: str = 'all dumps', run: str = "nothing",
-        isGet: bool = True, isClean: bool = False, isGenerate: bool = False) -> None:
+        UserFrame: DataManagerFrame = None, PassWordFrame: DataManagerFrame = None, loadDumps: str = 'all dumps',
+        run: str = "nothing", isGet: bool = True, isClean: bool = False, isGenerate: bool = False) -> None:
     """
     display the error in the label
     :param errorLabel: label to display the error
     :param loadingLabel: label to display the loading
     :param DockerFrame: frame to display the docker container
+    :param UserFrame: frame to display the user
+    :param PassWordFrame: frame to display the password
     :param loadDumps: the dumps to load
     :param run: the command to run
     :param isGet: if the command is get
@@ -148,7 +151,7 @@ def Run(errorLabel: tk.Label, loadingLabel: tk.Label, DockerFrame: DataManagerFr
 
     if isGet:
         error: Error = Runner(loadingLabel=loadingLabel, DockerFrame=DockerFrame, UserFrame=UserFrame,
-                              loadDumps=loadDumps, run=run)
+                              PassWordFrame=PassWordFrame, loadDumps=loadDumps, run=run)
         titre = "Get"
         description = "Get the dumps"
     elif isClean:
@@ -156,7 +159,8 @@ def Run(errorLabel: tk.Label, loadingLabel: tk.Label, DockerFrame: DataManagerFr
         titre = "Clean"
         description = "Clean the dumps folder"
     elif isGenerate:
-        error: Error = GenerateDumps(loadingLabel=loadingLabel, DockerFrame=DockerFrame, UserFrame=UserFrame, )
+        error: Error = GenerateDumps(loadingLabel=loadingLabel, DockerFrame=DockerFrame, UserFrame=UserFrame,
+                                     PassWordFrame=PassWordFrame)
         titre = "Generate"
         description = "Generate the dumps"
     else:

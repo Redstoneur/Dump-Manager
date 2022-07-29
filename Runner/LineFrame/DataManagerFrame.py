@@ -14,10 +14,9 @@ class DataManagerFrame(LineFrame):
     """
 
     label: tk.Label
-    textfield: tk.Text
+    textfield: tk.Entry
     booleanVar: tk.BooleanVar
     checkbox: tk.Checkbutton
-    textfield_password: tk.Entry
     booleanVar_password: tk.BooleanVar
     checkbox_password: tk.Checkbutton
 
@@ -30,8 +29,6 @@ class DataManagerFrame(LineFrame):
         :param master: tk.Tk, main window
         :return: None
         """
-        if isPassword:
-            grid_columnconfigure_Max += 1
         super().__init__(master, grid_columnconfigure_Max)
 
         self.textlabel: str = textlabel
@@ -52,19 +49,17 @@ class DataManagerFrame(LineFrame):
         column: int = 0
         self.create_Label(column=column)
 
-        # textfield
-        if self.isPassword:
-            column += 1
-            self.create_textfield_password(column=column)
-            column += 1
-            self.create_checkbox_password(column=column)
-        else:
-            column += 1
-            self.create_textfield(column=column)
+        column += 1
+        self.create_textfield(column=column)
 
         # checkbox
         column += 1
         self.create_checkbox(column=column)
+
+        # textfield
+        if self.isPassword:
+            column += 1
+            self.create_checkbox_password(column=column)
 
     def create_Label(self, column: int, sticky: str = "we"):
         """
@@ -85,21 +80,12 @@ class DataManagerFrame(LineFrame):
         :param sticky: str, sticky
         :return: None
         """
-        self.textfield = tk.Text(self, height=1, width=20)
+        if self.isPassword:
+            self.textfield = tk.Entry(self, show="*", width=20)
+        else:
+            self.textfield = tk.Entry(self, show="", width=20)
         self.textfield.insert(tk.END, self.get_default())
         self.textfield.grid(row=0, column=column, sticky=sticky)
-
-    def create_textfield_password(self, column: int, sticky: str = "we"):
-        """
-        create textfield password
-        @description: function to create the textfield password
-        :param column: int, column
-        :param sticky: str, sticky
-        :return: None
-        """
-        self.textfield_password = tk.Entry(self, show="*", width=20)
-        self.textfield_password.insert(tk.END, self.get_default())
-        self.textfield_password.grid(row=0, column=column, sticky=sticky)
 
     def create_checkbox(self, column: int, sticky: str = "we"):
         """
@@ -128,7 +114,8 @@ class DataManagerFrame(LineFrame):
         :return: None
         """
         self.booleanVar_password = tk.BooleanVar()
-        self.checkbox_password = tk.Checkbutton(self, text="see", variable=self.booleanVar_password, onvalue=True,
+        self.checkbox_password = tk.Checkbutton(self, text="show", variable=self.booleanVar_password, onvalue=True,
+                                                height=1,
                                                 offvalue=False, command=lambda: self.set_show_password())
         if self.defaultValueCheckbox:
             self.checkbox_password.select()
@@ -143,10 +130,7 @@ class DataManagerFrame(LineFrame):
         @description: function to get the textfield value
         :return: str
         """
-        if self.isPassword:
-            return self.textfield_password.get().replace("\n", "")
-        else:
-            return self.textfield.get("1.0", tk.END).replace("\n", "")
+        return self.textfield.get().replace("\n", "")
 
     def get_default(self):
         """
@@ -163,32 +147,15 @@ class DataManagerFrame(LineFrame):
         :return: None
         """
         if self.booleanVar.get():
-            if self.isPassword:
-                self.textfield_password.config(state="disabled")
-            else:
-                self.textfield.config(state="disabled")
+            self.textfield.config(state="disabled")
         else:
-            if self.isPassword:
-                self.textfield_password.config(state="normal")
-            else:
-                self.textfield.config(state="normal")
+            self.textfield.config(state="normal")
 
     def set_default(self, value: str = None):
         """
         set default value
         @description: function to set the default value
         :param value: str, value
-        :return: None
-        """
-        if self.isPassword:
-            self.set_default_textfield_password(value)
-        else:
-            self.set_default_textfield(value)
-
-    def set_default_textfield(self, value: str = None):
-        """
-        set default value textfield
-        @description: function to set the default value textfield
         :return: None
         """
         if self.booleanVar.get():
@@ -202,23 +169,6 @@ class DataManagerFrame(LineFrame):
         if self.booleanVar.get():
             self.textfield.config(state="disabled")
 
-    def set_default_textfield_password(self, value: str = None):
-        """
-        set default value textfield password
-        @description: function to set the default value textfield password
-        :return: None
-        """
-        if self.booleanVar.get():
-            self.textfield_password.config(state="normal")
-
-        self.textfield_password.delete(0, tk.END)
-        if value is not None:
-            self.defaultValueTextfield = value
-        self.textfield_password.insert(tk.END, self.defaultValueTextfield)
-
-        if self.booleanVar.get():
-            self.textfield_password.config(state="disabled")
-
     def set_show_password(self):
         """
         set show password
@@ -227,6 +177,6 @@ class DataManagerFrame(LineFrame):
         """
         if self.isPassword:
             if self.booleanVar_password.get():
-                self.textfield_password.config(show="*")
+                self.textfield.config(show="*")
             else:
-                self.textfield_password.config(show="")
+                self.textfield.config(show="")

@@ -27,6 +27,14 @@ def get_default_user_name() -> str:
     return str(DatabaseInfo.get("user"))
 
 
+def get_default_password() -> str:
+    """
+    get the default password
+    :return: str, password
+    """
+    return str(DatabaseInfo.get("password"))
+
+
 def get_docker_container(DockerFrame: DataManagerFrame) -> str | None:
     NameDockerContainer: str = DockerFrame.get_default()
     if NameDockerContainer is not None:  # if is a docker command
@@ -52,6 +60,22 @@ def get_user_name(UserFrame: DataManagerFrame = None) -> str:
         UserName = Name  # set the name of the user
 
     return UserName
+
+
+def get_password(PasswordFrame: DataManagerFrame) -> str:
+    """
+    get the password
+    :param PasswordFrame: DataManagerFrame, frame of the password
+    :return: str, password
+    """
+    Password: str = PasswordFrame.get_default()
+    value: str = PasswordFrame.get_textfield_value()
+    if value == "":  # if the password is empty
+        PasswordFrame.set_default(get_default_password())
+    else:  # if the password is not empty
+        Password = value  # set the password
+
+    return Password
 
 
 def ignoredFile(txt: str):
@@ -190,12 +214,13 @@ def CleanDumpsFolder(loadingLabel: tk.Label = None, loadDumps="all dumps") -> Er
 
 
 def ShellRunner(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = None, UserFrame: DataManagerFrame = None,
-                loadDumps: str = 'all dumps') -> Error:
+                PassWordFrame: DataManagerFrame = None, loadDumps: str = 'all dumps') -> Error:
     """
     dump all databases with a shell command
     :param loadingLabel: tk.Label, loading label
     :param DockerFrame: DataManagerFrame, docker frame
     :param UserFrame: DataManagerFrame, user frame
+    :param PassWordFrame: DataManagerFrame, password frame
     :param loadDumps: str, load dumps
     :return: Error, error message
     """
@@ -217,6 +242,7 @@ def ShellRunner(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = N
     code: int = 200
 
     user: str = get_user_name(UserFrame)
+    password: str = get_password(PassWordFrame)
 
     # check if is a docker command and get the docker container if is necessary
     NameDockerContainer: str = get_docker_container(DockerFrame=DockerFrame)
@@ -256,7 +282,7 @@ def ShellRunner(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = N
             # shell command to dump the database
             command: str = turnCommandeToExecutable(command=AddDumpsCommand,
                                                     user=user,
-                                                    password=str(DatabaseInfo.get("password")),
+                                                    password=password,
                                                     dump=sql.getPath(),
                                                     NameDockerContainer=NameDockerContainer)
 
@@ -312,12 +338,13 @@ def ShellRunner(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = N
 
 
 def GenerateDumps(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame = None,
-                  UserFrame: DataManagerFrame = None) -> Error:
+                  UserFrame: DataManagerFrame = None, PassWordFrame: DataManagerFrame = None) -> Error:
     """
     generate a dump of the database
     :param loadingLabel: tk.Label, label to show the progress of the dump
     :param DockerFrame: DataManagerFrame, frame to show the docker container
     :param UserFrame: DataManagerFrame, frame to show the user
+    :param PassWordFrame: DataManagerFrame, frame to show the password
     :return: Error, error message
     """
     success: bool = True
@@ -331,6 +358,7 @@ def GenerateDumps(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame =
     print("Dump started")
 
     user: str = get_user_name(UserFrame)
+    password: str = get_password(PassWordFrame)
 
     # check if is a docker command and get the docker container if is necessary
     NameDockerContainer: str = get_docker_container(DockerFrame=DockerFrame)
@@ -351,7 +379,7 @@ def GenerateDumps(loadingLabel: tk.Label = None, DockerFrame: DataManagerFrame =
         strDate: str = "(" + date.getYearString() + "-" + date.getMonthString() + "-" + date.getDayString() + ")"
         command: str = turnCommandeToExecutable(command=GenerateDumpCommand,
                                                 user=user,
-                                                password=str(DatabaseInfo.get("password")),
+                                                password=password,
                                                 dump=DumpsPath + "/" + db + "_" + strDate + ".sql",
                                                 NameDockerContainer=NameDockerContainer,
                                                 db=db)

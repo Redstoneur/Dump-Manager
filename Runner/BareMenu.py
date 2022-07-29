@@ -21,11 +21,19 @@ class BareMenu(tk.Menu):
 
     def __init__(self, master: tk.Tk, errorLabel: tk.Label, loadingLabel: tk.Label,
                  DockerFrame: DataManagerFrame = None, UserFrame: DataManagerFrame = None,
+                 PassWordFrame: DataManagerFrame = None,
                  ComboboxDumps: tk.Listbox = None, run: str = "nothing") -> None:
         """
         init of the class
         @description: function to init the class
         :param master: tk.Tk, main window
+        :param errorLabel: tk.Label, label of error
+        :param loadingLabel: tk.Label, label of loading
+        :param DockerFrame: DataManagerFrame, frame of docker
+        :param UserFrame: DataManagerFrame, frame of user
+        :param PassWordFrame: DataManagerFrame, frame of password
+        :param ComboboxDumps: tk.Listbox, combobox of dumps
+        :param run: str, run command
         :return: None
         """
         super().__init__(master)
@@ -34,6 +42,7 @@ class BareMenu(tk.Menu):
         self.loadingLabel = loadingLabel
         self.DockerFrame = DockerFrame
         self.UserFrame = UserFrame
+        self.PassWordFrame = PassWordFrame
         self.ComboboxDumps = ComboboxDumps
         self.run = run
         self.create_menu()
@@ -68,6 +77,7 @@ class BareMenu(tk.Menu):
         self.menuUtile.add_command(label="Run",
                                    command=lambda: Run(errorLabel=self.errorLabel, loadingLabel=self.loadingLabel,
                                                        DockerFrame=self.DockerFrame, UserFrame=self.UserFrame,
+                                                       PassWordFrame=self.PassWordFrame,
                                                        loadDumps=self.ComboboxDumps.get(
                                                            self.ComboboxDumps.curselection()), run=self.run))
         # menuUtile.add_command(label="Use textfield path add dump", command=lambda: useTextfieldPathAddDump())
@@ -79,10 +89,12 @@ class BareMenu(tk.Menu):
                                    command=lambda: CleanDataInformation(errorLabel=self.errorLabel))
         self.menuUtile.add_command(label="Clean Dumps folder",
                                    command=lambda: Run(errorLabel=self.errorLabel, loadingLabel=self.loadingLabel,
+                                                       PassWordFrame=self.PassWordFrame,
                                                        isGet=False, isClean=True, isGenerate=False))
         self.menuUtile.add_command(label="Generate Dumps",
                                    command=lambda: Run(errorLabel=self.errorLabel, loadingLabel=self.loadingLabel,
                                                        DockerFrame=self.DockerFrame, UserFrame=self.UserFrame,
+                                                       PassWordFrame=self.PassWordFrame,
                                                        isGet=False, isClean=False, isGenerate=True))
         self.menuUtile.add_command(label="Quit", command=lambda: self.master.destroy())
         self.menuUtile.add_command(label="Exit", command=lambda: exit())

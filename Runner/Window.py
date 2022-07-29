@@ -102,11 +102,11 @@ class Window(tk.Tk):
         row += 1
         self.grid_rowconfigure(row, weight=1)
 
-        Userkey: str = "user"
+        UserKey: str = "user"
         self.UserFrame = DataManagerFrame(master=self,
                                           grid_columnconfigure_Max=self.grid_columnconfigure_Max,
-                                          textlabel=Userkey,
-                                          defaultValueTextfield=str(DatabaseInfo.get(Userkey)),
+                                          textlabel=UserKey,
+                                          defaultValueTextfield=str(DatabaseInfo.get(UserKey)),
                                           textCheckbox="Use value",
                                           defaultValueCheckbox=True)
 
@@ -117,11 +117,11 @@ class Window(tk.Tk):
         row += 1
         self.grid_rowconfigure(row, weight=1)
 
-        PassWordkey: str = "password"
+        PassWordKey: str = "password"
         self.PassWordFrame = DataManagerFrame(master=self,
                                               grid_columnconfigure_Max=self.grid_columnconfigure_Max,
-                                              textlabel=PassWordkey,
-                                              defaultValueTextfield=str(DatabaseInfo.get(PassWordkey)),
+                                              textlabel=PassWordKey,
+                                              defaultValueTextfield=str(DatabaseInfo.get(PassWordKey)),
                                               textCheckbox="Use value",
                                               defaultValueCheckbox=True,
                                               isPassword=True)
@@ -134,11 +134,11 @@ class Window(tk.Tk):
             row += 1
             self.grid_rowconfigure(row, weight=1)
 
-            Dockerkey: str = "doker_container"
+            DockerKey: str = "doker_container"
             self.DockerFrame = DataManagerFrame(master=self,
                                                 grid_columnconfigure_Max=self.grid_columnconfigure_Max,
-                                                textlabel=Dockerkey,
-                                                defaultValueTextfield=str(DatabaseInfo.get(Dockerkey)),
+                                                textlabel=DockerKey,
+                                                defaultValueTextfield=str(DatabaseInfo.get(DockerKey)),
                                                 textCheckbox="Use value",
                                                 defaultValueCheckbox=True)
 
@@ -185,6 +185,7 @@ class Window(tk.Tk):
         self.RunButton = tk.Button(self, text="Run",
                                    command=lambda: Run(errorLabel=self.errorLabel, loadingLabel=self.loadingLabel,
                                                        DockerFrame=self.DockerFrame, UserFrame=self.UserFrame,
+                                                       PassWordFrame=self.PassWordFrame,
                                                        loadDumps=self.ComboboxDumps.get(
                                                            self.ComboboxDumps.curselection()), run=self.run))
         self.RunButton.grid(row=row, column=0, sticky="nsew")
@@ -224,6 +225,6 @@ class Window(tk.Tk):
 
         # create the menu bar
         self.menu = BareMenu(master=self, errorLabel=self.errorLabel, loadingLabel=self.loadingLabel,
-                             DockerFrame=self.DockerFrame, UserFrame=self.UserFrame,
+                             DockerFrame=self.DockerFrame, UserFrame=self.UserFrame, PassWordFrame=self.PassWordFrame,
                              ComboboxDumps=self.ComboboxDumps, run=self.run)
         self.config(menu=self.menu)
